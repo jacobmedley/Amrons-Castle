@@ -43,7 +43,7 @@ function ModelDetails({ agentId, snapshot }: { agentId: string | null; snapshot:
 
 export function LiveApp() {
   const hidden = usePageHidden();
-  const { snapshot, receivedAt, now, error, retry } = useLiveCastle();
+  const { snapshot, receivedAt, now, error, checks, changed, retry } = useLiveCastle();
   const [assets, setAssets] = useState<Assets | null>(null), [assetError, setAssetError] = useState('');
   const [view, setView] = useState<'castle' | 'work'>('castle');
   const [selected, setSelected] = useState<string | null>(null), [selectedRun, setSelectedRun] = useState<string | null>(null), [selectedRoom, setSelectedRoom] = useState<RoomId | null>(null);
@@ -97,7 +97,7 @@ export function LiveApp() {
     </header>
     <main><section className="page-heading"><div><p className="eyebrow">YOUR AGENTS, IN THEIR ELEMENT</p><h1>The realm, connected.</h1><p>Persistent characters. Recorded work. Your decisions.</p></div><button className="quiet-button" onClick={retry}>Refresh</button></section>
       <section className="kingdom-readout" aria-label="Kingdom at a glance"><div className="signal-toolbar"><QueueBadges entries={entries} controls={signals} onNavigate={navigateSignal} confirmed={completeObservation} live/><SignalInbox entries={entries} controls={signals} onNavigate={navigateSignal}/></div><Telemetry live/></section>
-      <div className="live-health"><p role="status">{!completeObservation ? statusText : 'Connected · Checkpoint observations'}{!fresh && snapshot ? ' Last recorded work is retained.' : ''}</p><small>{receivedAt ? `Last checked ${new Date(receivedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : 'Read-only connection · no model calls from this page'}</small></div>
+      <div className="live-health"><p role="status">{!completeObservation ? statusText : 'Connected · Auto-check every 6s'}{!fresh && snapshot ? ' Last recorded work is retained.' : ''}</p><small className="poll-readout"><span className="poll-dot" key={checks} aria-hidden="true"/>{receivedAt ? `Check ${checks} · ${new Date(receivedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })} · ${changed ? 'Work updated' : 'No task changes'}` : 'Read-only connection · no model calls from this page'}</small></div>
       <div className="realm-layout"><section className="realm-main" aria-label={view === 'castle' ? 'Castle overview' : 'Recorded work'}>
         <div className="realm-toolbar"><div className="realm-title"><span className="realm-sigil"><Compass size={18}/></span><strong>{view === 'castle' ? 'Castle of Amron' : 'The work ledger'}</strong><span className="toolbar-divider"/><span className="quiet-text">{fresh ? 'Observed checkpoints' : 'Awaiting fresh observations'}</span></div></div>
         {view === 'castle' ? <div className="map-wrap">{assets ? <Scene ref={scene} assets={assets} state={sceneState} paused={paused || reduced || hidden || !completeObservation} reduced={reduced} selected={selected||(run?agentForRun(run):null)} entries={entries} confirmed={completeObservation} onSelect={selectAgent} onRoom={selectRoom} onScale={setScale} animateIdle={completeObservation}/> : <div className="asset-loading"><CastleTurret size={38}/><strong>{assetError || 'Opening the castle gates…'}</strong>{assetError && <button onClick={() => location.reload()}>Reload</button>}</div>}

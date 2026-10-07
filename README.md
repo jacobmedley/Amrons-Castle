@@ -64,3 +64,5 @@ The [kingdom signals verification](docs/changes/kingdom-signals/verification.md)
 ## License
 
 Released under the [MIT License](LICENSE), including the project code and original generated artwork. Third-party components retain their existing licenses in `licenses/`.
+
+The [living-castle update](docs/changes/living-castle/verification.md) adds a stable floating usage disclosure, refresh evidence, LOKI beside Amron, and ambient light, water and fairy encounters. Work observations check about every six seconds and usage about every 30 seconds while visible. Ordinary Codex chats are not automatically Genesis runs. Pause motion and reduced motion cover the visual effects.

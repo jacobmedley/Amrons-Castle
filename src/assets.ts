@@ -1,6 +1,6 @@
 import type { Agent } from './model';
 export type Frame = { x: number; y: number; w: number; h: number; footX: number; footY: number; row?: number; frame?: number };
-export type Assets = { castle: HTMLImageElement; amron: HTMLImageElement; specialists: HTMLImageElement; frames: Frame[]; idle: HTMLImageElement | null };
+export type Assets = { castle: HTMLImageElement; amron: HTMLImageElement; specialists: HTMLImageElement; frames: Frame[]; idle: HTMLImageElement | null; attention: HTMLImageElement | null; loki: HTMLImageElement | null };
 export const idleActivities: Record<string, string> = { amron: 'Taking a quiet moment', orin: 'Resting', mira: 'Playing chess', liora: 'Stretching', quill: 'Enjoying tea', borin: 'Resting', flint: 'Playing chess' };
 // Generated atlas has uneven row heights. Anchors are measured at the feet/stool,
 // not the prop's center, so a raised cup or chess move never shifts the actor.
@@ -34,9 +34,16 @@ export function paintSprite(ctx: CanvasRenderingContext2D, assets: Assets, agent
   ctx.imageSmoothingEnabled=false;
   ctx.drawImage(image,r.x,r.y,r.w,r.h,Math.round(x-r.footX*s),Math.round(y-r.footY*s),Math.round(r.w*s),Math.round(r.h*s));
 }
+// Each raised-arm pose uses the same floor anchor, measured independently of the hands.
+export function paintAttention(ctx: CanvasRenderingContext2D, assets: Assets, agent: Agent, x: number, y: number, frame: number) {
+  if (!assets.attention || agent.id !== 'borin') { paintSprite(ctx, assets, agent, x, y); return; }
+  const poses = [[0,0,603,651,318,558],[603,0,604,651,309,558],[0,651,603,652,318,515],[603,651,604,652,291,515]];
+  const [sx,sy,w,h,fx,fy] = poses[frame % 4], s = .116;
+  ctx.drawImage(assets.attention,sx,sy,w,h,Math.round(x-fx*s),Math.round(y-fy*s),Math.round(w*s),Math.round(h*s));
+}
 const loadImage=(url:string)=>new Promise<HTMLImageElement>((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Castle artwork could not load.'));image.src=url;});
 const assetUrl=(name:string)=>new URL(`assets/${name}`,document.baseURI).href;
 export async function loadAssets(): Promise<Assets> {
-  const [castle,amron,specialists,frames,idle]=await Promise.all([loadImage(assetUrl('castle.png')),loadImage(assetUrl('amron.png')),loadImage(assetUrl('specialists.png')),fetch(assetUrl('specialists-frames.json')).then(r=>{if(!r.ok)throw new Error('Character frames unavailable.');return r.json() as Promise<Frame[]>;}),loadImage(assetUrl('idle.png')).catch(()=>null)]);
-  return {castle,amron,specialists,frames,idle};
+  const [castle,amron,specialists,frames,idle,attention,loki]=await Promise.all([loadImage(assetUrl('castle.png')),loadImage(assetUrl('amron.png')),loadImage(assetUrl('specialists.png')),fetch(assetUrl('specialists-frames.json')).then(r=>{if(!r.ok)throw new Error('Character frames unavailable.');return r.json() as Promise<Frame[]>;}),loadImage(assetUrl('idle.png')).catch(()=>null),loadImage(assetUrl('borin-attention.png')).catch(()=>null),loadImage(assetUrl('loki.png')).catch(()=>null)]);
+  return {castle,amron,specialists,frames,idle,attention,loki};
 }

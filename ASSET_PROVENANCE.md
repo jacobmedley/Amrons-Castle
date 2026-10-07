@@ -9,6 +9,8 @@ The environment and sprites were created for this project on October 7, 2026, us
 | `public/assets/specialists.png` | 1024 × 1536, transparent | One character generation: six specialists with four action poses each. |
 | `public/assets/specialists-frames.json` | Structured metadata | Measured source rectangles and foot anchors for the specialist sprites. Generated sheet spacing is not assumed to be uniform. |
 | `public/assets/idle.png` | 1536 × 1024, transparent | Fourteen new idle poses: two each for Amron and the six specialists. Tea, sleep, stretching and chess activities; generated with the built-in image tool using the original cast sheets as identity references. Measured unequal row heights and per-frame foot anchors are in `src/assets.ts`. |
+| `public/assets/borin-attention.png` | 1207 × 1303, transparent | Four original raised-arm attention poses made with the built-in image-generation tool, using Borin's existing sheet as an identity reference. Original generated pixels preserved; measured floor anchors are in `src/assets.ts`. [Full prompt](public/assets/borin-attention.prompt.txt). |
+| `public/assets/loki.png` | 1536 × 2288, transparent | The owner's existing custom companion artwork, reused unchanged at his request for LOKI beside Amron. Its original 192 × 208 cells provide idle, jump and snack gestures. Unused cells are excluded. No pet account setting or original asset was changed. |
 
 The application preserves the original raster files. It selects measured frames and renders them at a consistent display scale with image smoothing disabled. World coordinates and walkable routes follow the resulting environment rather than the coordinates initially requested in the art prompt.
 
@@ -21,6 +23,8 @@ The project owner supplied Secret of Mana screenshots as references for overhead
 The owner also referenced [AgentOffice](https://github.com/harishkotra/agent-office) and [Pixel Agents](https://github.com/pixel-agents-hq/pixel-agents) as interaction inspiration for visible agents at work. Their engines and source code are not incorporated. These references do not imply endorsement or affiliation.
 
 The generated result is an original interpretation of a 16-bit RPG aesthetic, not a claim of compliance with historical console palette or hardware limits.
+
+The living-castle effects (torch light, atelier window light, ripples, fish and a tiny fairy) are procedural Canvas animation. The fairy encounter is decorative; it does not represent agent work or change any tasks. [Animation frame verification](docs/changes/living-castle/screenshots/animation-frames.png) shows the raised-arm poses and LOKI's catch sequence.
 
 ## Distinguish other assets
 

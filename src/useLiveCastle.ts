@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { parseLiveSnapshot, type LiveSnapshot } from './live';
 
 export function useLiveCastle() {
@@ -7,6 +7,8 @@ export function useLiveCastle() {
   const [now, setNow] = useState(Date.now);
   const [error, setError] = useState('');
   const [refresh, setRefresh] = useState(0);
+  const [checks, setChecks] = useState(0), [changed, setChanged] = useState(false);
+  const previous = useRef('');
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
@@ -22,7 +24,11 @@ export function useLiveCastle() {
         if (response.status === 401 || response.status === 403) throw new Error('Sign-in required. Open the dashboard to reconnect.');
         if (!response.ok) throw new Error('Dashboard updates are unavailable. Retrying automatically.');
         const data = parseLiveSnapshot(await response.json());
-        if (!cancelled) { setSnapshot(data); setReceivedAt(Date.now()); setNow(Date.now()); setError(''); }
+        if (!cancelled) {
+          const fingerprint = JSON.stringify(data.runs);
+          setChanged(!!previous.current && previous.current !== fingerprint); previous.current = fingerprint;
+          setChecks(value => value + 1); setSnapshot(data); setReceivedAt(Date.now()); setNow(Date.now()); setError('');
+        }
       } catch (failure) {
         if (!cancelled) setError(failure instanceof TypeError ? 'Dashboard connection interrupted. Retrying automatically.' : failure instanceof Error && failure.name !== 'AbortError' ? failure.message : 'The dashboard did not respond. Retrying automatically.');
       } finally {
@@ -36,5 +42,5 @@ export function useLiveCastle() {
     void load();
     return () => { cancelled = true; clearTimeout(timer); clearInterval(clock); request?.abort(); document.removeEventListener('visibilitychange', visibility); };
   }, [refresh]);
-  return { snapshot, receivedAt, now, error, retry: () => setRefresh(value => value + 1) };
+  return { snapshot, receivedAt, now, error, checks, changed, retry: () => setRefresh(value => value + 1) };
 }
