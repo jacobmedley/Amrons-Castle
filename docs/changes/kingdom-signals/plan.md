@@ -1,6 +1,6 @@
 # Kingdom signals
 
-Status: ready for implementation. The approved castle artwork and existing behavior are the baseline. No enhancement is marked complete by this plan.
+Status: implemented and locally verified on October 7, 2026. See [verification](verification.md) for browser evidence, automated checks, and the account-allowance and savings-data limitations. The approved castle artwork and existing behavior remain the baseline.
 
 ## Outcome
 

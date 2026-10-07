@@ -3,7 +3,7 @@ export type RoomId = 'war' | 'wizard' | 'elf' | 'forge' | 'hall' | 'grounds';
 export type Status = 'working' | 'review' | 'blocked' | 'complete' | 'unconfirmed';
 export type Agent = { id: string; name: string; title: string; folk: string; room: RoomId; color: string; spriteRow: number; position: Point; description: string };
 export type Room = { id: RoomId; name: string; purpose: string; label: Point; center: Point; bounds: [number, number, number, number] };
-export type Task = { id: string; title: string; description: string; owner: string; status: Status; stage: number; progress: number; output: string; feedback: string; primary?: boolean };
+export type Task = { id: string; title: string; description: string; owner: string; status: Status; stage: number; progress: number; output: string; feedback: string; primary?: boolean; updatedAt?: number };
 export type ActivityEvent = { id: number; agent: string; text: string; time: number };
 export type Travel = { agent: string; elapsed: number; duration: number; path: Point[] };
 export type DemoState = { tasks: Task[]; events: ActivityEvent[]; time: number; travel: Travel[]; revision: number };
@@ -91,7 +91,7 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
       const progress = Math.min(100, task.progress + seconds * (task.primary ? 4 : 0.7));
       if (progress < 100) return { ...task, progress };
       next = event(next, task.owner, `${task.primary ? 'Prepared for review' : 'Completed'}: ${task.title}.`);
-      return { ...task, progress, status: task.primary ? 'review' as const : 'complete' as const, output: task.primary ? outputs[task.stage] : task.output };
+      return { ...task, progress, updatedAt: state.time + seconds, status: task.primary ? 'review' as const : 'complete' as const, output: task.primary ? outputs[task.stage] : task.output };
     });
     return { ...next, tasks };
   }
@@ -101,17 +101,17 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
     const done = task.stage === 5;
     const stage = done ? task.stage : task.stage + 1;
     const owner = done ? task.owner : owners[stage];
-    let next = { ...state, tasks: state.tasks.map(t => t.id === task.id ? { ...t, stage, owner, status: done ? 'complete' as const : 'working' as const, progress: done ? 100 : 0, output: done ? t.output : 'Work is underway. The next sample output will appear when this stage is ready for review.', feedback: '' } : t), revision: state.revision + 1 };
+    let next = { ...state, tasks: state.tasks.map(t => t.id === task.id ? { ...t, stage, owner, updatedAt: state.time, status: done ? 'complete' as const : 'working' as const, progress: done ? 100 : 0, output: done ? t.output : 'Work is underway. The next sample output will appear when this stage is ready for review.', feedback: '' } : t), revision: state.revision + 1 };
     const actor = agents.find(a => a.id === task.owner)!;
     if (!done && actor.id !== 'amron') next = { ...next, travel: [...state.travel.filter(t => t.agent !== actor.id), { agent: actor.id, elapsed: 0, duration: 18, path: travelPath(actor) }] };
     return event(next, 'amron', done ? 'Marked the Moonwell quest complete.' : `Approved ${stages[task.stage].toLowerCase()}. ${agents.find(a => a.id === owner)?.name} takes the next step.`);
   }
   if (action.type === 'revise' && task.status === 'review' && action.feedback.trim()) {
-    const next = { ...state, tasks: state.tasks.map(t => t.id === task.id ? { ...t, status: 'working' as const, progress: 0, feedback: action.feedback.trim(), output: `Revision requested: ${action.feedback.trim()}\n\nThe sample agent is revisiting this stage.` } : t) };
+    const next = { ...state, tasks: state.tasks.map(t => t.id === task.id ? { ...t, updatedAt: state.time, status: 'working' as const, progress: 0, feedback: action.feedback.trim(), output: `Revision requested: ${action.feedback.trim()}\n\nThe sample agent is revisiting this stage.` } : t) };
     return event(next, 'amron', `Requested changes from ${agents.find(a => a.id === task.owner)?.name}.`);
   }
   if (action.type === 'unblock' && task.status === 'blocked') {
-    const next = { ...state, tasks: state.tasks.map(t => t.id === task.id ? { ...t, status: 'working' as const, output: 'Sample catalog supplied. Archive search work can continue.' } : t) };
+    const next = { ...state, tasks: state.tasks.map(t => t.id === task.id ? { ...t, updatedAt: state.time, status: 'working' as const, output: 'Sample catalog supplied. Archive search work can continue.' } : t) };
     return event(next, task.owner, 'Received the sample catalog. Work is moving again.');
   }
   return state;

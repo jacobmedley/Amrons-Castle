@@ -10,6 +10,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App.tsx";
 import { LiveApp } from "./LiveApp.tsx";
 import "./styles.css";
+import "./kingdom.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

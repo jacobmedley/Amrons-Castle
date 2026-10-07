@@ -24,7 +24,7 @@ export function useLiveCastle() {
         const data = parseLiveSnapshot(await response.json());
         if (!cancelled) { setSnapshot(data); setReceivedAt(Date.now()); setNow(Date.now()); setError(''); }
       } catch (failure) {
-        if (!cancelled) setError(failure instanceof Error && failure.name !== 'AbortError' ? failure.message : 'The dashboard did not respond. Retrying automatically.');
+        if (!cancelled) setError(failure instanceof TypeError ? 'Dashboard connection interrupted. Retrying automatically.' : failure instanceof Error && failure.name !== 'AbortError' ? failure.message : 'The dashboard did not respond. Retrying automatically.');
       } finally {
         clearTimeout(timeout); request = null;
         if (!cancelled) timer = setTimeout(load, 6000);

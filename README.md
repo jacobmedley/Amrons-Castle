@@ -33,6 +33,10 @@ The static build is in `dist/client`. Relative asset URLs support hosting under 
 - Every stage waits for approval, through Amron’s final review.
 - Inspect sample model/effort assignments without confusing them with runtime telemetry.
 - Use keyboard controls, Pause motion, reduced-motion preferences and Reset demo.
+- Click Working, Needs you, Complete or Blocked to visit the next task in that queue. Repeated clicks cycle through individual tasks and center the responsible character.
+- Open Signals to inspect new handoffs and status changes. Reading a signal never approves work.
+- Watch the fellowship rest, stretch, enjoy tea and play chess between quests. These idle scenes are decorative.
+- In the connected realm, expand the Royal Ledger to choose a usage source and reporting window. Cache reuse, account allowance and proven savings remain separate quantities.
 
 The Queen coordinates from the Royal War Room. Orin and Mira research and plan in the Wizard Workshop; Liora and Quill design and write in the Elven Atelier; Borin and Flint engineer and test in the Dwarven Forge. Identities persist as tasks change owners.
 
@@ -48,10 +52,14 @@ The default demo makes no API requests. No credentials, private records, machine
 - `src/Scene.tsx` and `src/assets.ts`: Canvas rendering, camera, sprite frames and accessible overlays.
 - `src/App.tsx`: standalone demo experience.
 - `src/live.ts`, `src/useLiveCastle.ts`, `src/LiveApp.tsx`: optional Genesis observation adapter.
+- `src/signals.ts`, `src/KingdomSignals.tsx`: shared queue ordering, agent badges and notification ledger.
+- `src/telemetry.ts`, `src/UsageReadout.tsx`: source-specific usage validation and compact readout.
 - `public/assets`: original generated raster artwork and dependency notices.
 - `tests`: transition, selection, model-display and observation-contract checks.
 
 [Case study](case-study.md) · [Artwork provenance](ASSET_PROVENANCE.md) · [Dependency notices](THIRD_PARTY_NOTICES.md) · [Contributing](CONTRIBUTING.md)
+
+The [kingdom signals verification](docs/changes/kingdom-signals/verification.md) records the fluid-layout, interaction, motion and telemetry checks for this enhancement.
 
 ## License
 

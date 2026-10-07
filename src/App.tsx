@@ -1,4 +1,5 @@
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { usePageHidden } from './usePageHidden';
+import { useMemo, useEffect, useReducer, useRef, useState } from 'react';
 import { Crown } from '@phosphor-icons/react/dist/csr/Crown';
 import { CastleTurret } from '@phosphor-icons/react/dist/csr/CastleTurret';
 import { Scroll } from '@phosphor-icons/react/dist/csr/Scroll';
@@ -24,6 +25,10 @@ import { ExecutionDetails, ExecutionOverview, ExecutionRosterLabel } from './Exe
 import { loadAssets, paintSprite, type Assets } from './assets';
 import { agents, rooms, agentTask, createDemo, demoReducer, stages, statusLabels, type Agent, type RoomId, type Status, type Task } from './model';
 
+import { QueueBadges, SignalInbox, useSignals } from './KingdomSignals';
+import { agentSignal, demoSignals, type SignalEntry } from './signals';
+import { Telemetry } from './UsageReadout';
+
 const roomIcons={war:Crown,wizard:BookOpen,elf:PaintBrush,forge:Hammer,hall:CastleTurret,grounds:Tree};
 export function Portrait({agent,assets,large=false}:{agent:Agent;assets:Assets|null;large?:boolean}){
   const ref=useRef<HTMLCanvasElement>(null);
@@ -33,7 +38,10 @@ export function Portrait({agent,assets,large=false}:{agent:Agent;assets:Assets|n
 function StatusBadge({status}:{status:Status|'ready'}){return <span className={`status-badge ${status}`}><i/>{status==='ready'?'Ready':statusLabels[status]}</span>;}
 
 export function App(){
+  const hidden=usePageHidden();
   const [state,dispatch]=useReducer(demoReducer,undefined,createDemo);
+  const entries=useMemo(()=>demoSignals(state),[state.tasks]);
+  const signals=useSignals(entries);
   const [assets,setAssets]=useState<Assets|null>(null),[error,setError]=useState('');
   const [view,setView]=useState<'castle'|'quests'>('castle');
   const [selected,setSelected]=useState<string|null>(null),[selectedTask,setSelectedTask]=useState<string|null>(null),[selectedRoom,setSelectedRoom]=useState<RoomId|null>(null);
@@ -42,44 +50,46 @@ export function App(){
   const [scale,setScale]=useState(1),[feedback,setFeedback]=useState(''),[editing,setEditing]=useState(false),[notice,setNotice]=useState('');
   const scene=useRef<SceneHandle>(null),help=useRef<HTMLDialogElement>(null),executionHelp=useRef<HTMLDialogElement>(null),panel=useRef<HTMLElement>(null),returnFocus=useRef<HTMLElement|null>(null);
   const focusPanel=()=>requestAnimationFrame(()=>{panel.current?.querySelector('.panel-scroll')?.scrollTo({top:0});panel.current?.focus({preventScroll:true});});
-  const rememberTrigger=()=>{const active=document.activeElement;if(active instanceof HTMLElement&&!panel.current?.contains(active))returnFocus.current=active.matches('button,a[href],[tabindex]')?active:null;};
+  const rememberTrigger=()=>{const active=document.activeElement;if(active instanceof HTMLElement&&!panel.current?.contains(active))returnFocus.current=active.matches('button,a[href],summary,[tabindex]')?active:null;};
   const selectAgent=(id:string)=>{rememberTrigger();setSelected(id);setSelectedTask(null);setSelectedRoom(null);setEditing(false);setFeedback('');};
   const selectTask=(id:string)=>{rememberTrigger();setSelectedTask(id);setSelected(null);setSelectedRoom(null);setEditing(false);setFeedback('');};
   const selectRoom=(id:RoomId)=>{rememberTrigger();setSelectedRoom(id);setSelected(null);setSelectedTask(null);};
-  const clearSelection=(restoreFocus=true)=>{setSelected(null);setSelectedTask(null);setSelectedRoom(null);setEditing(false);if(restoreFocus){const previous=returnFocus.current;const target=previous?.isConnected&&previous.getClientRects().length&&getComputedStyle(previous).visibility!=='hidden'?previous:document.querySelector<HTMLElement>('.brand');target?.focus({preventScroll:true});}};
+  const clearSelection=(restoreFocus=true)=>{setSelected(null);setSelectedTask(null);setSelectedRoom(null);setEditing(false);if(restoreFocus){const previous=returnFocus.current;const target=previous?.isConnected&&!previous.matches(':disabled')&&previous.getClientRects().length&&getComputedStyle(previous).visibility!=='hidden'?previous:document.querySelector<HTMLElement>('.brand');target?.focus({preventScroll:true});}};
   useEffect(()=>{let cancelled=false;loadAssets().then(a=>{if(!cancelled)setAssets(a);}).catch(e=>{if(!cancelled)setError(String(e.message));});return()=>{cancelled=true;};},[]);
   useEffect(()=>{const media=window.matchMedia('(prefers-reduced-motion: reduce)');const update=()=>setReduced(media.matches);media.addEventListener('change',update);return()=>media.removeEventListener('change',update);},[]);
   useEffect(()=>{const timer=setInterval(()=>{if(!paused&&!document.hidden)dispatch({type:'tick',seconds:.25});},250);return()=>clearInterval(timer);},[paused]);
   useEffect(()=>{const key=(event:KeyboardEvent)=>{if(event.key==='Escape'&&!help.current?.open&&!executionHelp.current?.open){clearSelection();}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[]);
   useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(''),5000);return()=>clearTimeout(timer);},[notice]);
   useEffect(()=>{if(selected||selectedTask||selectedRoom)panel.current?.focus({preventScroll:true});},[selected,selectedTask,selectedRoom]);
-  useEffect(()=>{panel.current?.querySelector('.panel-scroll')?.scrollTo({top:0});if((selected||selectedTask||selectedRoom)&&window.matchMedia('(max-width:780px)').matches)panel.current?.scrollIntoView({behavior:reduced?'instant':'smooth',block:'nearest'});},[selected,selectedTask,selectedRoom,reduced]);
-  useEffect(()=>{if(view==='castle'&&selectedRoom){const frame=requestAnimationFrame(()=>scene.current?.focusRoom(selectedRoom));return()=>cancelAnimationFrame(frame);}},[view,selectedRoom]);
+  useEffect(()=>{panel.current?.querySelector('.panel-scroll')?.scrollTo({top:0});if((selected||selectedTask||selectedRoom)&&window.matchMedia('(max-width:780px)').matches)panel.current?.scrollIntoView({behavior:reduced||paused?'instant':'smooth',block:'nearest'});},[selected,selectedTask,selectedRoom,reduced]);
+  useEffect(()=>{if(view==='castle'&&selectedRoom){const frame=requestAnimationFrame(()=>scene.current?.focusRoom(selectedRoom));return()=>cancelAnimationFrame(frame);}},[view,selectedRoom,assets]);
   const selectedAgent=agents.find(a=>a.id===selected),task=state.tasks.find(t=>t.id===selectedTask),room=rooms.find(r=>r.id===selectedRoom);
+  const navigateSignal=(entry:SignalEntry)=>{setView('castle');selectTask(entry.id);if(entry.agentId)scene.current?.focusAgent(entry.agentId);focusPanel();};
+  useEffect(()=>{if(view!=='castle'||!task)return;const frame=requestAnimationFrame(()=>scene.current?.focusAgent(task.owner));return()=>cancelAnimationFrame(frame);},[view,task?.id,task?.owner,assets]);
   const reviewCount=state.tasks.filter(t=>t.status==='review').length;
   const counts=(status:Status)=>state.tasks.filter(t=>t.status===status).length;
-  const reset=()=>{dispatch({type:'reset'});setPaused(false);clearSelection(false);setFilter('all');scene.current?.fit();setNotice('The demo is reset. Orin’s brief is ready for review.');};
+  const reset=()=>{signals.reset(demoSignals(createDemo()));dispatch({type:'reset'});setPaused(false);clearSelection(false);setFilter('all');scene.current?.fit();setNotice('The demo is reset. Orin’s brief is ready for review.');};
   const approve=(t:Task)=>{dispatch({type:'approve',id:t.id});focusPanel();setNotice(t.stage===5?'The Moonwell quest is complete.':`${stages[t.stage]} approved. The next specialist is getting started.`);setEditing(false);};
   const taskRow=(t:Task)=><button key={t.id} className="compact-task" onClick={()=>selectTask(t.id)}><span><small>{stages[t.stage]}</small><strong>{t.title}</strong><StatusBadge status={t.status}/></span><CaretRight size={16}/></button>;
   const castList=(cast:Agent[])=><div className="agent-list">{cast.map(agent=>{const t=agentTask(state,agent.id);return <button key={agent.id} onClick={()=>selectAgent(agent.id)}><Portrait agent={agent} assets={assets}/><span><strong>{agent.name}</strong><small>{agent.title}</small></span><span className={`small-dot ${t?.status||'ready'}`} title={t?statusLabels[t.status]:'Ready'}/><CaretRight size={13}/></button>;})}</div>;
 
-  return <div className="app-shell">
+  return <div className={`app-shell ${paused||reduced||hidden?'motion-still':'motion-active'}`}>
     <header className="topbar"><a className="brand" href="#" onClick={e=>{e.preventDefault();setView('castle');clearSelection(false);scene.current?.fit();}}><span className="brand-mark"><CastleTurret size={28} weight="duotone"/></span><span>Amron’s Castle<small>A REALM OF POSSIBILITY</small></span></a>
       <nav aria-label="Main navigation"><button className={view==='castle'?'active':''} aria-current={view==='castle'?'page':undefined} onClick={()=>setView('castle')}><CastleTurret size={18}/>The castle</button><button className={view==='quests'?'active':''} aria-current={view==='quests'?'page':undefined} onClick={()=>setView('quests')}><Scroll size={18}/>Quest board<span className="nav-count">{state.tasks.length}</span></button></nav>
       <div className="header-actions">{new URLSearchParams(window.location.search).get('dashboard')==='1'&&<a className="dashboard-return" href="./index.html?mode=live">Live castle</a>}<span className="demo-label"><i/>DEMO REALM</span><button className="icon-button help-button" aria-label="How to explore the castle" onClick={()=>help.current?.showModal()}><Question size={21}/></button></div>
     </header>
     <main>
       <section className="page-heading"><div><p className="eyebrow">YOUR AGENTS, IN THEIR ELEMENT</p><h1>{view==='castle'?'The realm is at work.':'Good work begins with a quest.'}</h1><p>Seven minds. Four crafts. One shared adventure.</p></div><button className="quiet-button reset" onClick={reset}><ArrowCounterClockwise size={16}/>Reset demo</button></section>
-      <div className="execution-summary"><span><i className="execution-dot"/><strong>Demo execution</strong><span>No models running</span></span><button onClick={()=>executionHelp.current?.showModal()}>Model & effort<ArrowRight size={14}/></button></div>
+      <section className="kingdom-readout" aria-label="Kingdom at a glance"><div className="signal-toolbar"><QueueBadges entries={entries} controls={signals} onNavigate={navigateSignal}/><SignalInbox entries={entries} controls={signals} onNavigate={navigateSignal} demo/></div><Telemetry/></section>
       <div className="realm-layout">
         <section className="realm-main" aria-label={view==='castle'?'Castle overview':'Quest board'}>
           <div className="realm-toolbar"><div className="realm-title"><span className="realm-sigil"><Compass size={18}/></span><strong>{view==='castle'?'Castle of Amron':'The quest ledger'}</strong><span className="toolbar-divider"/><span className="quiet-text">{view==='castle'?'Enchanted woodland':'Sample tasks'}</span></div><span className="realm-weather">{view==='castle'?'A quiet autumn afternoon':`${state.tasks.length} quests in the realm`}</span></div>
           {view==='castle'?<div className="map-wrap">
-            {assets?<Scene ref={scene} assets={assets} state={state} paused={paused||reduced} reduced={reduced} selected={selected} onSelect={selectAgent} onRoom={selectRoom} onScale={setScale}/>:<div className="asset-loading"><CastleTurret size={38}/><strong>{error||'Opening the castle gates…'}</strong>{error&&<button onClick={()=>window.location.reload()}>Try again</button>}</div>}
+            {assets?<Scene ref={scene} assets={assets} state={state} paused={paused||reduced||hidden} reduced={reduced} selected={selected||task?.owner||null} entries={entries} onSelect={selectAgent} onRoom={selectRoom} onScale={setScale}/>:<div className="asset-loading"><CastleTurret size={38}/><strong>{error||'Opening the castle gates…'}</strong>{error&&<button onClick={()=>window.location.reload()}>Try again</button>}</div>}
             <div className="map-controls"><button aria-label="Zoom out" title="Zoom out" onClick={()=>scene.current?.zoom(.8)}><Minus size={16}/></button><span>{Math.round(scale*100)}%</span><button aria-label="Zoom in" title="Zoom in" onClick={()=>scene.current?.zoom(1.25)}><Plus size={16}/></button><i/><button className="fit-button" onClick={()=>scene.current?.fit()}><ArrowsOut size={16}/><span>Fit castle</span></button></div>
             <button className="motion-button" onClick={()=>setPaused(p=>!p)} aria-pressed={paused}>{paused?<Play size={15} weight="fill"/>:<Pause size={15} weight="fill"/>}{paused?'Resume demo':'Pause motion'}</button>
           </div>:<div className="quest-board"><div className="quest-filters" aria-label="Filter quests">{(['all','review','working','blocked','complete'] as const).map(s=><button key={s} aria-pressed={filter===s} className={filter===s?'active':''} onClick={()=>setFilter(s)}>{s==='all'?'All quests':statusLabels[s]}<span>{s==='all'?state.tasks.length:counts(s)}</span></button>)}</div><div className="quest-cards">{state.tasks.filter(t=>filter==='all'||t.status===filter).map(t=><button className={`quest-card ${selectedTask===t.id?'selected':''}`} key={t.id} onClick={()=>selectTask(t.id)}><div><span className="quest-number">QUEST {String(state.tasks.indexOf(t)+1).padStart(2,'0')}</span><StatusBadge status={t.status}/></div><h2>{t.title}</h2><p>{t.description}</p><footer><span>{agents.find(a=>a.id===t.owner)?.name} <span className="quiet-text">· {stages[t.stage]}</span></span><ArrowRight size={18}/></footer></button>)}</div>{!state.tasks.some(t=>filter==='all'||t.status===filter)&&<div className="empty-state"><Check size={32}/><h2>All clear here.</h2><p>No quests in this state. Explore another filter.</p></div>}</div>}
-          <div className="map-footer"><span><i className="small-dot working"/> {counts('working')} working</span><button onClick={()=>{setView('quests');setFilter('review');}}><i className="small-dot review"/>{reviewCount} need you</button><span><i className="small-dot complete"/>{counts('complete')} complete</span><small>{view==='castle'?(reduced?'Reduced motion enabled':'Drag to explore · Scroll to zoom'):'All activity is simulated'}</small></div>
+          <div className="map-footer"><span className="map-legend"><i className="small-dot review"/>Choose a badge to follow the queue</span><small>{view==='castle'?(reduced?'Reduced motion enabled':paused?'Demo paused':'Drag to explore · Scroll to zoom'):'All activity is simulated'}</small></div>
         </section>
         <aside ref={panel} className="detail-panel" aria-label="Realm details" tabIndex={-1}>
           <div className="panel-top"><p className="eyebrow">{task?'QUEST DETAILS':selectedAgent?'MEET YOUR AGENT':room?'EXPLORE THE CASTLE':'THE WAR ROOM'}</p>{(task||selectedAgent||room)&&<button className="icon-button" aria-label="Close details" onClick={()=>clearSelection()}><X size={17}/></button>}</div>
@@ -96,7 +106,8 @@ export function App(){
           </div><div className="panel-foot"><span className="demo-label"><i/>DEMO</span><span>Sample quests. No live agents connected.</span></div>
         </aside>
       </div>
-      <section className="cast-section"><div className="cast-heading"><h2>The fellowship</h2><span>Different gifts. Shared purpose.</span><small>{agents.length} AGENTS</small></div><div className="cast-roster">{agents.map(agent=>{const task=agentTask(state,agent.id);return <button className={`cast-card ${selected===agent.id?'selected':''}`} key={agent.id} onClick={()=>selectAgent(agent.id)}><Portrait agent={agent} assets={assets}/><span><strong>{agent.name}</strong><small>{agent.title}</small><StatusBadge status={agent.id==='amron'&&reviewCount?'review':task?.status||'ready'}/><ExecutionRosterLabel agentId={agent.id}/></span></button>;})}</div></section>
+      <section className="cast-section"><div className="cast-heading"><h2>The fellowship</h2><span>Different gifts. Shared purpose.</span><small>{agents.length} AGENTS</small></div><div className="cast-roster">{agents.map(agent=>{const task=agentTask(state,agent.id);return <button className={`cast-card ${selected===agent.id?'selected':''}`} key={agent.id} onClick={()=>selectAgent(agent.id)}><Portrait agent={agent} assets={assets}/><span><strong>{agent.name}</strong><small>{agent.title}</small><StatusBadge status={agentSignal(entries,agent.id).status||'ready'}/><ExecutionRosterLabel agentId={agent.id}/></span></button>;})}</div></section>
+      <p className="observation-footnote">Demo only · No models running. <button onClick={()=>executionHelp.current?.showModal()}>Requested settings ≠ runtime acceptance · Model & effort ↗</button></p>
       <footer className="page-footer"><span><CastleTurret size={14}/>A little magic. Meaningful work.</span><span>Local prototype <i/> An independent agent realm</span></footer>
     </main>
     {notice&&<div className="toast" role="status"><Check size={18}/>{notice}<button className="icon-button" aria-label="Dismiss notification" onClick={()=>setNotice('')}><X size={16}/></button></div>}
