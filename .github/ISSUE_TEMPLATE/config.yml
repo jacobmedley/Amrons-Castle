@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Read the backlog and enhancement ideas
+    url: https://github.com/jacobmedley/Amrons-Castle/blob/main/BACKLOG.md
+    about: Check planned work before proposing a duplicate.
+  - name: Report a security concern
+    url: https://github.com/jacobmedley/Amrons-Castle/blob/main/SECURITY.md
+    about: Keep vulnerability details and sensitive information out of public issues.

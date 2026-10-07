@@ -2,9 +2,13 @@
 
 An independent, interactive fantasy RPG interface for agent work. Explore a castle, inspect a persistent cast of specialists, and follow tasks through explicit review and handoff.
 
+**v0.1.0 · Public prototype · MIT**
+
+[Release notes](CHANGELOG.md) · [Enhancement ledger](docs/ENHANCEMENTS.md) · [Backlog and ideas](BACKLOG.md) · [Report a bug](https://github.com/jacobmedley/Amrons-Castle/issues/new?template=bug_report.yml)
+
 Queen **Amron** is inspired by the creator’s wife. “Amron” is her name spelled backwards. Her identity belongs to the character, not to a model or model release. She remains a Black warrior queen with dark braids, a crown, gold-trimmed armor and a violet cloak.
 
-![Amron’s Castle](screenshots/castle-overview.png)
+![Amron’s Castle with LOKI, task signals and a compact ledger](docs/changes/living-castle/screenshots/desktop.png)
 
 ## Run locally
 
@@ -37,8 +41,18 @@ The static build is in `dist/client`. Relative asset URLs support hosting under 
 - Open Signals to inspect new handoffs and status changes. Reading a signal never approves work.
 - Watch the fellowship rest, stretch, enjoy tea and play chess between quests. These idle scenes are decorative.
 - In the connected realm, expand the Royal Ledger to choose a usage source and reporting window. Cache reuse, account allowance and proven savings remain separate quantities.
+- Open the ledger without moving the castle: the panel expands over the scene, then its contents fade in. Escape or an outside click closes it.
+- Find LOKI in the Royal War Room. Select him to invite a fairy when motion is enabled. Ambient stories, fish and torchlight do not represent model work.
 
 The Queen coordinates from the Royal War Room. Orin and Mira research and plan in the Wizard Workshop; Liora and Quill design and write in the Elven Atelier; Borin and Flint engineer and test in the Dwarven Forge. Identities persist as tasks change owners.
+
+## Understand updates and customization
+
+The live adapter checks recorded work about every 6 seconds and usage about every 30 seconds while the page is visible. The check counter advances even when tasks stay unchanged. Upstream usage can be cached. Ordinary Codex chats, including development of this project, are not automatically Genesis runs.
+
+Pause motion stops visual effects; live observations continue. In the Demo, pausing also stops simulated progression. Operating-system reduced motion provides a static scene and disables fairy invitations.
+
+Character-name editing, selectable color themes and saved preferences are **planned**, not available in this release. The [backlog](BACKLOG.md) defines their acceptance criteria. Bug and enhancement reports use GitHub forms; the application does not upload diagnostics automatically.
 
 ## Independent core, optional integrations
 
@@ -50,19 +64,31 @@ The default demo makes no API requests. No credentials, private records, machine
 
 - `src/model.ts`: persistent identities, rooms, typed demo state, transitions and walkable routes.
 - `src/Scene.tsx` and `src/assets.ts`: Canvas rendering, camera, sprite frames and accessible overlays.
+- `src/ambience.ts`: lighting, pond animation and LOKI's decorative fairy encounters.
 - `src/App.tsx`: standalone demo experience.
 - `src/live.ts`, `src/useLiveCastle.ts`, `src/LiveApp.tsx`: optional Genesis observation adapter.
 - `src/signals.ts`, `src/KingdomSignals.tsx`: shared queue ordering, agent badges and notification ledger.
 - `src/telemetry.ts`, `src/UsageReadout.tsx`: source-specific usage validation and compact readout.
-- `public/assets`: original generated raster artwork and dependency notices.
+- `public/assets`: castle/character artwork, companion assets, generation prompts and dependency notices.
 - `tests`: transition, selection, model-display and observation-contract checks.
 
-[Case study](case-study.md) · [Artwork provenance](ASSET_PROVENANCE.md) · [Dependency notices](THIRD_PARTY_NOTICES.md) · [Contributing](CONTRIBUTING.md)
+[Case study](case-study.md) · [Artwork provenance](ASSET_PROVENANCE.md) · [Dependency notices](THIRD_PARTY_NOTICES.md) · [Contributing](CONTRIBUTING.md) · [Release procedure](docs/RELEASING.md)
 
-The [kingdom signals verification](docs/changes/kingdom-signals/verification.md) records the fluid-layout, interaction, motion and telemetry checks for this enhancement.
+The [kingdom signals verification](docs/changes/kingdom-signals/verification.md) and [living castle verification](docs/changes/living-castle/verification.md) record interaction, layout, animation and telemetry evidence. The current suite has 35 tests. Browser checks do not establish full accessibility conformance or physical-device coverage.
+
+## Troubleshoot the prototype
+
+| Symptom | What to check |
+|---|---|
+| Characters do not animate | Check Pause motion and your operating-system reduced-motion setting. In live mode, stale or partial observations also pause the scene. |
+| Live task counts stay unchanged | Check the successful-check counter. Existing completed work stays complete; this view does not track every open coding conversation. |
+| Usage does not change at each check | Check its source, reporting window, retrieval time and coverage notes. Upstream records can be cached. |
+| Live mode says unavailable | Use the standalone Demo unless a compatible authenticated host is installed. The repository does not include the Genesis server. |
+| Preferences or tasks reset | Demo state is in memory. Persistent customization is planned in the backlog. |
+| Artwork or fonts do not load | Run the app through Vite or a web server, not a `file:` URL. For a static host, keep the full `dist/client` directory and its relative asset paths. |
+
+For another problem, [file a bug](https://github.com/jacobmedley/Amrons-Castle/issues/new?template=bug_report.yml) with your version, environment and reproduction steps. Read [SECURITY.md](SECURITY.md) before reporting a vulnerability. Follow the [code of conduct](CODE_OF_CONDUCT.md) in project discussions.
 
 ## License
 
 Released under the [MIT License](LICENSE), including the project code and original generated artwork. Third-party components retain their existing licenses in `licenses/`.
-
-The [living-castle update](docs/changes/living-castle/verification.md) adds a stable floating usage disclosure, refresh evidence, LOKI beside Amron, and ambient light, water and fairy encounters. Work observations check about every six seconds and usage about every 30 seconds while visible. Ordinary Codex chats are not automatically Genesis runs. Pause motion and reduced motion cover the visual effects.

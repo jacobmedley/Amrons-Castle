@@ -1,0 +1,61 @@
+name: Report a bug
+description: Report broken behavior, layout, motion or accessibility.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Search existing issues first. Use fictional Demo data where possible. Remove tokens, private URLs, account telemetry and private work from screenshots and logs. For security issues, read SECURITY.md."
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Use the release tag or the output of npm pkg get version and git rev-parse --short HEAD.
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Experience
+      options:
+        - Standalone Demo
+        - Demo hosted inside a dashboard
+        - Live Genesis adapter
+        - Another adapter
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, operating system and viewport
+      placeholder: Chrome, Windows, 1440 × 900; reduced motion enabled
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the starting state, selected task and relevant motion settings.
+      placeholder: "1. Open the Demo\n2. Select …\n3. Observe …"
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual behavior
+      description: Explain the difference and how often it occurs.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Public-safe evidence
+      description: Add screenshots, recordings or relevant redacted errors. Omit private work and account values.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked for duplicates and removed sensitive information from this report.
+          required: true

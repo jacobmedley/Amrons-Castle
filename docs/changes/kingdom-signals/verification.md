@@ -56,4 +56,4 @@ The compact hierarchy is inspired by [Token Use](https://tokenuse.app/), using t
 - Missing metrics stay unavailable rather than becoming zero. Stale and partial coverage remain visible. Known upstream accounting caveats are retained in the expanded source details.
 - Requested model settings and independently accepted runtime settings stay distinct. The explanation is now a footnote with detailed inspection available.
 
-The source remains an independent MIT project. This feature is committed locally on its own branch; private telemetry and live screenshots are not included in the public package.
+The source remains an independent MIT project. Private telemetry and live screenshots are excluded from the public package. This verification preceded the first numbered release; see the [release ledger](../../../CHANGELOG.md) for publication history.

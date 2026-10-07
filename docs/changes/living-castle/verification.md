@@ -40,6 +40,6 @@ TypeScript and the production build pass. All **35 tests** pass, including exist
 
 Original sprite alpha and frame occupancy were inspected. Borin's unequal generated cells use measured anchors. LOKI's empty atlas cells are excluded; the idle, leap and snack sequence was rendered from the actual runtime functions for the frame check above. Manual pause and reduced motion retain static artwork and disable fairy invitation while motion is unavailable.
 
-The build is installed into the existing local Genesis static Castle directory. No backend code or service restart was needed. The standalone Demo remains independent of Genesis. No public deployment or branch push is part of this update.
+The build was installed into the existing local Genesis static Castle directory. No backend code or service restart was needed. The standalone Demo remains independent of Genesis. These checks preceded the first numbered release; see the [release ledger](../../../CHANGELOG.md) for publication history. No public website deployment was performed.
 
 Artwork paths and the complete built-in generation prompt are documented in [asset provenance](../../../ASSET_PROVENANCE.md).
