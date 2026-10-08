@@ -15,6 +15,13 @@ Current release: **v0.1.0**. Entries below are proposals, not available features
 | AC-107 | Later | Needs design | Connect other agent systems | Document a backend-neutral observation contract and fictional fixture adapter. Preserve ownership, approval boundaries and uncertainty. Keep credentials and execution on the host. |
 | AC-108 | Later | Idea | Display a quest timeline | Show recorded handoffs, reviews and outputs with source timestamps. Separate simulated and observed history; do not reconstruct missing facts. |
 | AC-109 | Later | Idea | Add localization | Extract interface copy, support longer labels and locale-aware dates/numbers, and verify text expansion without changing IDs. |
+| AC-110 | Next | Idea | Full-screen castle command view | Make the castle the primary full-screen workspace with a persistent, compact sidebar for queue, stats, reporting and navigation. Reclaim unused space, preserve keyboard/focus behavior, support phone layouts and reduced motion, and keep the scene state separate from the task record. |
+| AC-111 | Next | Idea | Genesis identity and onboarding | Add a restrained animated Genesis mark and a first-run flow explaining Demo versus live observation, uncertainty, controls, preferences and installation. The animation must have a static/reduced-motion state and the onboarding must not imply credentials or provider access. |
+| AC-112 | Later | Idea | Infinite forest world | Extend the castle environment into an infinitely tileable forest with bounded rendering, camera continuity, touch/keyboard navigation, pause/reduced-motion support and no false activity signals. Refine the fairy and fish as decorative, provenance-documented assets. |
+| AC-113 | Later | Idea | Loki and Thor companions | Redesign LOKI around Jacob's approved real-dog references, add Thor as a separate persistent companion, and provide bounded random idle animations and interactions. Preserve immutable identities, accessible labels, provenance and explicit separation from agent activity. |
+| AC-114 | Later | Idea | Reusable theme system | Define a backend-neutral theme contract so the same agent, task, telemetry and interaction model can render Castle, Office, Orcs, Factory and AI Robot Factory themes. Themes must not fork state semantics, accessibility behavior or uncertainty rules. |
+| AC-115 | Later | Needs design | Cross-platform distribution | Define the supported installation and embedding targets, persistence model and host adapter contract so the visualisation can be reused across frameworks and platforms without moving credentials or execution into the client. Verify one reference integration before broadening support. |
+| AC-116 | Later | Needs design | Companion interactions and custom names | Extend AC-101 with character-to-character and character-to-environment interactions, custom names and safe persistence. Keep display names separate from immutable IDs, make interactions decorative unless explicitly tied to observed state, and verify long names and interaction controls on mobile. |
 
 ## Share an enhancement idea
 
@@ -27,6 +34,8 @@ Ideas to explore:
 - User-triggered celebrations for verified completions, with reduced-motion alternatives.
 - A quest archive with exportable, public-safe summaries.
 - Touch-first camera controls and an optional minimap.
+- A themeable agent visualisation platform that can scale beyond the Castle
+  without changing the underlying state and reporting model.
 
 These ideas are not approved implementation scope. Discussion, evidence and maintainer review determine priority.
 
