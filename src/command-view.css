@@ -1,0 +1,92 @@
+/* AC-110: the scene owns the viewport; commands and details stay within reach. */
+.app-shell main{padding:12px clamp(10px,1.3vw,22px) 0}
+.app-shell .topbar{height:62px;padding:0 clamp(10px,1.3vw,22px)}
+.app-shell .brand{font-size:24px}
+.app-shell .brand-mark{width:36px;height:38px}
+.app-shell .brand-mark svg{width:22px}
+.app-shell .brand small{margin-top:5px}
+.app-shell .realm-layout{display:grid;grid-template-columns:clamp(224px,17vw,276px) minmax(0,1fr) clamp(272px,21vw,338px);gap:10px;height:calc(100svh - 78px);min-height:570px;align-items:stretch}
+.app-shell .command-sidebar,.app-shell .detail-panel,.app-shell .realm-main{min-height:0;height:100%;max-height:none}
+.app-shell .command-sidebar{display:flex;flex-direction:column;overflow-y:auto;overflow-x:visible;background:#1b251d;border:1px solid #47543e;border-radius:7px;scrollbar-width:thin;scrollbar-color:#657351 transparent}
+.command-sidebar .page-heading{display:block;margin:0;padding:17px 15px 14px;border-bottom:1px solid #3c4938}
+.command-sidebar .page-heading h1{font-size:24px;line-height:1.05;margin:6px 0}
+.command-sidebar .page-heading p:not(.eyebrow){font-size:10px;line-height:1.4}
+.command-sidebar .page-heading .quiet-button{margin-top:12px;width:max-content}
+.command-nav{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:10px;border-bottom:1px solid #3c4938}
+.command-nav button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:37px;padding:5px;border:1px solid #536448;border-radius:4px;color:#c4d1b8;font-size:10px;white-space:nowrap}
+.command-nav button.active{background:#454c31;border-color:#b4a06e;color:#f1ddb3}
+.command-nav button:hover{background:#354430}
+.command-nav button svg{width:15px;height:15px}
+.command-nav .nav-count{font-size:8px;padding:1px 4px}
+.command-sidebar .kingdom-readout{margin:0;border:0;border-radius:0;background:none;box-shadow:none;z-index:auto}
+.command-sidebar .signal-toolbar{display:flex;flex-direction:column;align-items:stretch;gap:7px;padding:12px 10px}
+.command-sidebar .queue-badges{display:grid;grid-template-columns:1fr;gap:5px}
+.command-sidebar .queue-badge{width:100%;justify-content:flex-start;min-height:35px;text-align:left;padding:5px 8px}
+.command-sidebar .queue-badge strong{font-size:15px;min-width:18px;text-align:center}
+.command-sidebar .queue-badge small{margin-left:auto}
+.command-sidebar .signal-inbox>summary{justify-content:center;min-height:35px}
+.command-sidebar .inbox-popover{position:fixed;left:clamp(235px,18vw,285px);right:auto;top:74px;z-index:30}
+.command-sidebar .telemetry>.telemetry-toggle,.command-sidebar .telemetry-demo>.telemetry-toggle{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:13px 11px}
+.command-sidebar .telemetry-origin,.command-sidebar .telemetry-demo .telemetry-origin{grid-column:1/-1;grid-row:auto;border:0;border-bottom:1px solid #4b5841;padding:0 0 9px}
+.command-sidebar .metric strong{font-size:16px}
+.command-sidebar .activity-trace{display:grid}
+.command-sidebar .telemetry-state,.command-sidebar .telemetry-demo .telemetry-state{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;text-align:left;margin:0;border-top:1px solid #4b5841;padding-top:9px}
+.command-sidebar .telemetry-state small{max-width:150px}
+.command-sidebar .telemetry-disclosure{position:relative;left:auto;right:auto;top:auto;width:auto;filter:none}
+.command-sidebar .telemetry-expanded{max-height:360px;padding:12px}
+.command-sidebar .ledger-facts{grid-template-columns:1fr}
+.command-sidebar .telemetry-demo .demo-ledger-note{grid-column:1/-1;font-size:10px;line-height:1.5}
+.command-sidebar .live-health{display:block;margin:0;padding:13px 11px;border-top:1px solid #44513d;font-size:10px}
+.command-sidebar .live-health small{display:flex;margin-top:8px;white-space:normal;font-size:9px}
+.app-shell .map-wrap{height:auto;min-height:0;flex:1}
+.app-shell .quest-board{height:auto;min-height:0;max-height:none}
+.app-shell .detail-panel{min-height:0}
+.app-shell .cast-section{margin-top:17px}
+.app-shell .page-footer{padding:12px 0}
+@media(max-width:1120px){
+  .app-shell .realm-layout{grid-template-columns:220px minmax(0,1fr);height:auto;min-height:0}
+  .app-shell .command-sidebar{grid-row:1 / 3;min-height:600px;height:calc(100svh - 78px);max-height:850px}
+  .app-shell .realm-main{height:clamp(480px,calc(100svh - 78px),850px)}
+  .app-shell .detail-panel{height:370px;grid-column:2;grid-row:2}
+  .command-sidebar .inbox-popover{left:230px}
+}
+@media(max-width:720px){
+  .app-shell .topbar{height:58px;min-height:58px;flex-wrap:nowrap;padding:0 12px;gap:8px}
+  .app-shell .brand{font-size:20px}
+  .app-shell .brand-mark{display:none}
+  .app-shell .header-actions{gap:5px;margin-left:auto}
+  .app-shell main{padding:8px 8px 0}
+  .app-shell .realm-layout{display:flex;flex-direction:column;gap:8px}
+  .app-shell .command-sidebar{order:0;display:grid;grid-template-columns:1fr;min-height:0;height:auto;max-height:none;overflow:visible}
+  .command-sidebar .page-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px}
+  .command-sidebar .page-heading .eyebrow,.command-sidebar .page-heading p:not(.eyebrow){display:none}
+  .command-sidebar .page-heading h1{font-size:19px;margin:0}
+  .command-sidebar .page-heading .quiet-button{margin:0;font-size:10px}
+  .command-nav{grid-template-columns:1fr 1fr;padding:7px}
+  .command-sidebar .signal-toolbar{flex-direction:row;align-items:center;padding:7px}
+  .command-sidebar .queue-controls{flex:1}
+  .command-sidebar .queue-badges{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+  .command-sidebar .queue-badge{justify-content:center;flex-wrap:wrap;font-size:9px;min-height:40px;padding:3px}
+  .command-sidebar .queue-badge strong{font-size:13px;min-width:0}
+  .command-sidebar .queue-badge .badge-symbol{display:none}
+  .command-sidebar .queue-badge small{display:none}
+  .command-sidebar .signal-inbox>summary{min-width:36px}
+  .command-sidebar .inbox-popover{position:absolute;left:auto;right:0;top:calc(100% + 6px)}
+  .command-sidebar .telemetry>.telemetry-toggle,.command-sidebar .telemetry-demo>.telemetry-toggle{grid-template-columns:repeat(2,minmax(0,1fr));padding:8px 10px;gap:8px}
+  .command-sidebar .telemetry-origin{grid-column:1}
+  .command-sidebar .telemetry-demo .telemetry-origin{grid-column:1}
+  .command-sidebar .telemetry-state,.command-sidebar .telemetry-demo .telemetry-state{grid-column:2;border:0;padding:0}
+  .command-sidebar .telemetry:not(.telemetry-demo) .metric,.command-sidebar .telemetry:not(.telemetry-demo) .activity-trace{display:none}
+  .command-sidebar .telemetry-disclosure{left:auto;right:auto;top:auto;width:auto}
+  .command-sidebar .live-health{padding:8px 10px}
+  .app-shell .realm-main{order:1;height:440px;min-height:0}
+  .app-shell .detail-panel{order:2;height:min(520px,65svh);min-height:250px}
+  .app-shell .map-wrap{height:auto;min-height:0}
+}
+@media(max-width:420px){
+  .app-shell .topbar .demo-label{display:none}
+  .app-shell .brand{font-size:19px}
+  .command-sidebar .queue-badge{font-size:8px}
+  .app-shell .realm-main{height:410px}
+}
+@media(prefers-reduced-motion:reduce){.command-nav button{transition:none}}

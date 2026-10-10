@@ -38,6 +38,7 @@ The static build is in `dist/client`. Relative asset URLs support hosting under 
 - Inspect sample model/effort assignments without confusing them with runtime telemetry.
 - Use keyboard controls, Pause motion, reduced-motion preferences and Reset demo.
 - Click Working, Needs you, Complete or Blocked to visit the next task in that queue. Repeated clicks cycle through individual tasks and center the responsible character.
+- Use the command sidebar to switch between the castle and work board, inspect queues and signals, and expand usage details. On a phone, these controls sit above the castle.
 - Open Signals to inspect new handoffs and status changes. Reading a signal never approves work.
 - Watch the fellowship rest, stretch, enjoy tea and play chess between quests. These idle scenes are decorative.
 - In the connected realm, expand the Royal Ledger to choose a usage source and reporting window. Cache reuse, account allowance and proven savings remain separate quantities.
@@ -74,7 +75,7 @@ The default demo makes no API requests. No credentials, private records, machine
 
 [Case study](case-study.md) · [Artwork provenance](ASSET_PROVENANCE.md) · [Dependency notices](THIRD_PARTY_NOTICES.md) · [Contributing](CONTRIBUTING.md) · [Release procedure](docs/RELEASING.md)
 
-The [kingdom signals verification](docs/changes/kingdom-signals/verification.md) and [living castle verification](docs/changes/living-castle/verification.md) record interaction, layout, animation and telemetry evidence. The current suite has 35 tests. Browser checks do not establish full accessibility conformance or physical-device coverage.
+The [command view verification](docs/changes/command-view/verification.md), [kingdom signals verification](docs/changes/kingdom-signals/verification.md) and [living castle verification](docs/changes/living-castle/verification.md) record interaction, layout, animation and telemetry evidence. The current suite has 35 tests. Browser checks do not establish full accessibility conformance or physical-device coverage.
 
 ## Troubleshoot the prototype
 

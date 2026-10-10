@@ -11,6 +11,7 @@ import { App } from "./App.tsx";
 import { LiveApp } from "./LiveApp.tsx";
 import "./styles.css";
 import "./kingdom.css";
+import "./command-view.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
