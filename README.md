@@ -34,6 +34,7 @@ The static build is in `dist/client`. Relative asset URLs support hosting under 
 
 - Select a room or agent; drag to pan and scroll or use buttons to zoom.
 - Select **Full screen** in the castle toolbar to fill the display with the scene. Use **Exit full screen** to return to the command view, then switch to the quest or work board.
+- Rotate or resize the screen to see the rooms rearrange into portrait or panoramic compositions. **Fit castle** restores the whole arrangement; choose a room or agent to focus it.
 - Inspect Orin’s Moonwell brief. Approve to hand work to the next specialist, or request changes to keep the current owner and feedback.
 - Every stage waits for approval, through Amron’s final review.
 - Inspect sample model/effort assignments without confusing them with runtime telemetry.
@@ -76,7 +77,7 @@ The default demo makes no API requests. No credentials, private records, machine
 
 [Case study](case-study.md) · [Artwork provenance](ASSET_PROVENANCE.md) · [Dependency notices](THIRD_PARTY_NOTICES.md) · [Contributing](CONTRIBUTING.md) · [Release procedure](docs/RELEASING.md)
 
-The [command view verification](docs/changes/command-view/verification.md), [kingdom signals verification](docs/changes/kingdom-signals/verification.md) and [living castle verification](docs/changes/living-castle/verification.md) record interaction, layout, animation and telemetry evidence. The current suite has 35 tests. Browser checks do not establish full accessibility conformance or physical-device coverage.
+The [adaptive layout verification](docs/changes/adaptive-castle/verification.md), [command view verification](docs/changes/command-view/verification.md), [kingdom signals verification](docs/changes/kingdom-signals/verification.md) and [living castle verification](docs/changes/living-castle/verification.md) record interaction, layout, animation and telemetry evidence. The current suite has 37 tests. Browser checks do not establish full accessibility conformance or physical-device coverage.
 
 ## Troubleshoot the prototype
 

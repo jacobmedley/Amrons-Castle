@@ -5,6 +5,7 @@ The environment and sprites were created for this project on October 7, 2026, us
 | Asset | Dimensions | Creation and use |
 |---|---|---|
 | `public/assets/castle.png` | 1536 × 1024 | One environment generation: a roofless stone castle, six areas, warm torches, emerald forest and turquoise pool. A decorative suit of armor in the Great Hall belongs to the background, not the agent roster. |
+| `public/assets/enchanted-forest.png` | 1254 × 1254 | Generated October 10, 2026 with the castle as a style reference. The canvas mirrors a central crop to fill exposed space around the castle and rearranged room tiles. The source PNG is preserved. [Full prompt](public/assets/enchanted-forest.prompt.txt). |
 | `public/assets/amron.png` | 1498 × 1050, transparent | One character generation: eight poses for Amron, with four command/idle frames and four walking frames. |
 | `public/assets/specialists.png` | 1024 × 1536, transparent | One character generation: six specialists with four action poses each. |
 | `public/assets/specialists-frames.json` | Structured metadata | Measured source rectangles and foot anchors for the specialist sprites. Generated sheet spacing is not assumed to be uniform. |

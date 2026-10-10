@@ -9,10 +9,11 @@ Read [the backlog](BACKLOG.md) for proposed work and [the enhancement ledger](do
 - AC-110: a viewport-filling castle command view with persistent navigation, queue signals, notifications and usage in a compact sidebar. Recorded work and quest views use the same layout.
 - The command view adapts to narrow screens, keeping the castle, controls and detail panel accessible in one vertical flow.
 - A Full screen toggle expands the castle scene; Exit full screen restores the command view and its navigation.
+- AC-117: the six room tiles rearrange into portrait or panoramic compositions as the scene changes shape. Character pins, room labels and hit areas follow their rooms. Generated woodland fills exposed space.
 
 ### Verified
 
-- TypeScript checking, all 35 existing tests and the production build pass. Desktop, phone-sized, Demo and unavailable-live layouts were inspected in the browser.
+- TypeScript checking, all 37 tests and the production build pass. Desktop, portrait-phone, short-landscape, Demo and unavailable-live layouts were inspected in the browser.
 
 ## 0.1.0 - 2026-10-07
 

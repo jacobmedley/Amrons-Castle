@@ -13,6 +13,7 @@ This ledger records implemented behavior. Read [the backlog](../BACKLOG.md) for 
 | AC-007 | 0.1.0 | Automatic-check count, time and changed/unchanged task state | [Polling evidence](changes/living-castle/verification.md), commit `9e43cdd` |
 | AC-008 | 0.1.0 | Versioned release, backlog, issue forms, contributor/release guidance and CI configuration | [Contributing](../CONTRIBUTING.md), [release procedure](RELEASING.md), [workflow](../.github/workflows/ci.yml) |
 | AC-110 | Unreleased | Viewport-filling castle with persistent command sidebar, compact queues, usage, navigation and responsive detail layout | [Command view verification](changes/command-view/verification.md) |
+| AC-117 | Unreleased | Room tiles rearrange for portrait and panoramic scene shapes, preserving labels, characters and room selection; woodland extends the canvas | [Adaptive layout verification](changes/adaptive-castle/verification.md) |
 
 ## Record the next change
 

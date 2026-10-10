@@ -20,20 +20,23 @@ function glow(ctx:CanvasRenderingContext2D,x:number,y:number,r:number,color:stri
   const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,color);g.addColorStop(1,'transparent');
   ctx.globalAlpha=alpha;ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);
 }
-export function paintEnvironment(ctx:CanvasRenderingContext2D,time:number) {
+export function paintEnvironment(ctx:CanvasRenderingContext2D,time:number,bounds?:[number,number,number,number]) {
+  const within=(x:number,y:number)=>!bounds||(x>=bounds[0]&&x<=bounds[0]+bounds[2]&&y>=bounds[1]&&y<=bounds[1]+bounds[3]);
   ctx.save();ctx.globalCompositeOperation='screen';
   torches.forEach(([x,y],i)=>{
+    if(!within(x,y))return;
     const flicker=.83+Math.sin(time/237+i*2)*.1+Math.sin(time/113+i)*.06;
     glow(ctx,x,y,58,'#ffae49',.24*flicker);
     ctx.globalAlpha=.52*flicker;ctx.fillStyle='#ffe49b';ctx.fillRect(x-1,y-4,3,Math.round(5+flicker*3));
   });
   // A narrow light shaft originates at the atelier's visible window.
-  for(const [x,y] of [[1274,218]]){
+  for(const [x,y] of [[1274,218]]){if(!within(x,y))continue;
     const light=ctx.createLinearGradient(x,y,x-55,y+170);light.addColorStop(0,'#c5ead637');light.addColorStop(1,'#c5ead600');
     ctx.globalAlpha=.75;ctx.fillStyle=light;ctx.beginPath();ctx.moveTo(x-9,y);ctx.lineTo(x+10,y);ctx.lineTo(x+6,y+170);ctx.lineTo(x-106,y+170);ctx.closePath();ctx.fill();
     for(let i=0;i<8;i++){const t=(time/90+i*23)%150;ctx.globalAlpha=.15;ctx.fillStyle='#e9e5b7';ctx.fillRect(x-t*.36+(i%3)*10,y+t,2,2);}
   }
   ctx.globalCompositeOperation='source-over';
+  if(bounds&&!within(312,727)){ctx.restore();return;}
   // Soft ripples and waterfall glints are clipped to the water, not the surrounding forest.
   ctx.beginPath();ctx.moveTo(209,649);ctx.lineTo(265,651);ctx.lineTo(376,697);ctx.lineTo(398,752);ctx.lineTo(366,803);ctx.lineTo(305,773);ctx.lineTo(263,716);ctx.lineTo(220,700);ctx.closePath();ctx.clip();
   for(let i=0;i<16;i++){

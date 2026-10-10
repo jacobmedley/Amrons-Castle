@@ -1,16 +1,19 @@
-import { useEffect, useRef, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo, forwardRef, useImperativeHandle } from 'react';
 import { agents, rooms, WORLD, positionOnPath, toWorld, hitAgent, type Camera, type DemoState, type Point, type RoomId } from './model';
 import { idleActivities, paintIdle, paintSprite, paintAttention, type Assets } from './assets';
 import { WarningCircle } from '@phosphor-icons/react/dist/csr/WarningCircle';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import { LOKI, fairyPhase, paintEnvironment, paintCompanion } from './ambience';
 import { agentSignal, signalIcons, signalLabels, type SignalEntry } from './signals';
+import { paintForest } from './forest';
+import { createSceneLayout, placePoint, roomAt, roomLabelPoint } from './sceneLayout';
 export type SceneHandle = { fit: () => void; zoom: (factor:number) => void; focusRoom: (id:RoomId) => void; focusAgent: (id:string) => void };
 type Props={assets:Assets;state:DemoState;paused:boolean;reduced:boolean;selected:string|null;onSelect:(id:string)=>void;onRoom:(id:RoomId)=>void;onScale:(scale:number)=>void;animateIdle?:boolean; entries?:SignalEntry[]; confirmed?:boolean};
 const visibleAgents=agents;
 export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,paused,reduced,selected,onSelect,onRoom,onScale,animateIdle=true,entries=[],confirmed=true},ref){
   const host=useRef<HTMLDivElement>(null),canvas=useRef<HTMLCanvasElement>(null);
   const [size,setSize]=useState({width:900,height:600});
+  const layout=useMemo(()=>createSceneLayout(size.width,size.height),[size.width,size.height]);
   const [camera,setCamera]=useState<Camera>({x:0,y:0,scale:.6});
   const [hover,setHover]=useState<string|null>(null);
   const drag=useRef<{x:number;y:number;camera:Camera;moved:boolean}|null>(null);
@@ -20,16 +23,17 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
   const [lokiOpen,setLokiOpen]=useState(false),[invitedAt,setInvitedAt]=useState<number|null>(null);
   const eventSeed=useRef(Math.random());
   const lokiButton=useRef<HTMLButtonElement>(null);
-  const fit=useCallback(()=>{cameraMode.current='fit';const h=host.current;if(!h)return;const scale=Math.min(h.clientWidth/WORLD.width,h.clientHeight/WORLD.height);setCamera({x:(h.clientWidth-WORLD.width*scale)/2,y:(h.clientHeight-WORLD.height*scale)/2,scale});},[]);
+  const fit=useCallback(()=>{cameraMode.current='fit';const h=host.current;if(!h)return;const scale=Math.min(h.clientWidth/layout.width,h.clientHeight/layout.height);setCamera({x:(h.clientWidth-layout.width*scale)/2,y:(h.clientHeight-layout.height*scale)/2,scale});},[layout]);
   const zoom=useCallback((factor:number,anchor?:Point)=>{cameraMode.current='manual';setCamera(c=>{const point=anchor||{x:size.width/2,y:size.height/2};const next=Math.max(.25,Math.min(2.5,c.scale*factor));const w=toWorld(point,c);return {x:point.x-w.x*next,y:point.y-w.y*next,scale:next};});},[size]);
-  const focusRoom=useCallback((id:RoomId)=>{cameraMode.current='manual';const room=rooms.find(r=>r.id===id)!;const scale=Math.min(1.35,size.width/560,size.height/440);setCamera({scale,x:size.width/2-room.center.x*scale,y:size.height/2-room.center.y*scale});},[size]);
-  const focusAgent=useCallback((id:string)=>{const point=positions.current.find(item=>item.id===id)?.point||agents.find(agent=>agent.id===id)?.position;if(!point)return;cameraMode.current='manual';const scale=Math.min(1.5,size.width/480,size.height/340);setCamera({scale,x:size.width/2-point.x*scale,y:size.height/2-(point.y-20)*scale});},[size]);
+  const focusRoom=useCallback((id:RoomId)=>{cameraMode.current='manual';const room=rooms.find(r=>r.id===id)!;const point=placePoint(layout,id,room.center);const scale=Math.min(1.35,size.width/560,size.height/440);setCamera({scale,x:size.width/2-point.x*scale,y:size.height/2-point.y*scale});},[size,layout]);
+  const focusAgent=useCallback((id:string)=>{const agent=agents.find(item=>item.id===id);const point=positions.current.find(item=>item.id===id)?.point||(agent&&placePoint(layout,agent.room,agent.position));if(!point)return;cameraMode.current='manual';const scale=Math.min(1.5,size.width/480,size.height/340);setCamera({scale,x:size.width/2-point.x*scale,y:size.height/2-(point.y-20)*scale});},[size,layout]);
   useImperativeHandle(ref,()=>({fit,zoom,focusRoom,focusAgent}),[fit,zoom,focusRoom,focusAgent]);
-  useEffect(()=>{const h=host.current!;let previous={width:h.clientWidth,height:h.clientHeight};
+  useEffect(()=>{const h=host.current!;let previous={width:h.clientWidth,height:h.clientHeight};let previousMode=createSceneLayout(previous.width,previous.height).mode;
     const ro=new ResizeObserver(()=>{const next={width:h.clientWidth,height:h.clientHeight};setSize(current=>current.width===next.width&&current.height===next.height?current:next);
-      if(cameraMode.current==='fit'){const scale=Math.min(next.width/WORLD.width,next.height/WORLD.height);setCamera({x:(next.width-WORLD.width*scale)/2,y:(next.height-WORLD.height*scale)/2,scale});}
+      const nextLayout=createSceneLayout(next.width,next.height);
+      if(cameraMode.current==='fit'||nextLayout.mode!==previousMode){cameraMode.current='fit';const scale=Math.min(next.width/nextLayout.width,next.height/nextLayout.height);setCamera({x:(next.width-nextLayout.width*scale)/2,y:(next.height-nextLayout.height*scale)/2,scale});}
       else if(next.width!==previous.width||next.height!==previous.height){const dx=(next.width-previous.width)/2,dy=(next.height-previous.height)/2;setCamera(c=>({...c,x:c.x+dx,y:c.y+dy}));}
-      previous=next;
+      previous=next;previousMode=nextLayout.mode;
     });ro.observe(h);return()=>ro.disconnect();},[]);
   useEffect(()=>{onScale(camera.scale);},[camera.scale,onScale]);
   useEffect(()=>{const h=host.current!;const wheel=(event:WheelEvent)=>{event.preventDefault();const b=h.getBoundingClientRect();zoom(Math.exp(-event.deltaY*.0015),{x:event.clientX-b.left,y:event.clientY-b.top});};h.addEventListener('wheel',wheel,{passive:false});return()=>h.removeEventListener('wheel',wheel);},[zoom]);
@@ -40,15 +44,23 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
       if(cv.width!==Math.round(size.width*dpr)||cv.height!==Math.round(size.height*dpr)){cv.width=Math.round(size.width*dpr);cv.height=Math.round(size.height*dpr);}
       if(!paused&&!document.hidden&&last)frameTime.current+=Math.min(now-last,80);last=now;
       ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,size.width,size.height);ctx.fillStyle='#0c1713';ctx.fillRect(0,0,size.width,size.height);
-      ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);ctx.imageSmoothingEnabled=false;ctx.drawImage(assets.castle,0,0,WORLD.width,WORLD.height);
+      ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);ctx.imageSmoothingEnabled=false;
+      paintForest(ctx,assets.forest,camera,size.width,size.height);
+      if(layout.mode==='original')ctx.drawImage(assets.castle,0,0,WORLD.width,WORLD.height);
+      else for(const tile of layout.tiles){
+        ctx.save();ctx.shadowColor='#020b09';ctx.shadowBlur=25;ctx.fillStyle='#10201b';ctx.fillRect(tile.x-7,tile.y-7,tile.width+14,tile.height+14);ctx.restore();
+        ctx.drawImage(assets.castle,...tile.source,tile.x,tile.y,tile.width,tile.height);
+        ctx.strokeStyle='#c5a96d';ctx.lineWidth=3;ctx.strokeRect(tile.x-4,tile.y-4,tile.width+8,tile.height+8);
+      }
       const ambientTime=reduced?0:frameTime.current;
-      paintEnvironment(ctx,ambientTime);
-      positions.current=visibleAgents.map(agent=>{const travel=!reduced&&state.travel.find(t=>t.agent===agent.id);return {id:agent.id,point:travel?positionOnPath(travel.path,travel.elapsed/travel.duration):agent.position};});
+      if(layout.mode==='original')paintEnvironment(ctx,ambientTime);
+      else for(const tile of layout.tiles){ctx.save();ctx.beginPath();ctx.rect(tile.x,tile.y,tile.width,tile.height);ctx.clip();ctx.translate(tile.x-tile.source[0],tile.y-tile.source[1]);paintEnvironment(ctx,ambientTime,tile.source);if(tile.id==='war')paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt));ctx.restore();}
+      positions.current=visibleAgents.map(agent=>{const travel=layout.mode==='original'&&!reduced&&state.travel.find(t=>t.agent===agent.id);const point=travel?positionOnPath(travel.path,travel.elapsed/travel.duration):agent.position;return {id:agent.id,point:placePoint(layout,agent.room,point)};});
       const sorted=[...positions.current].sort((a,b)=>a.point.y-b.point.y);
       for(const {id,point:p} of sorted){
         const agent=agents.find(a=>a.id===id)!;
         const signal=agentSignal(entries,id);
-        const walking=!reduced&&state.travel.some(t=>t.agent===id);
+        const walking=layout.mode==='original'&&!reduced&&state.travel.some(t=>t.agent===id);
         const working=confirmed&&signal.assigned.some(entry=>entry.status==='working');
         const attention=confirmed&&(signal.status==='review'||signal.status==='blocked');
         const time=reduced?0:frameTime.current;
@@ -78,21 +90,21 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
           ctx.fillStyle='#d0cee9';ctx.font='bold 14px monospace';ctx.fillText('z',p.x+18,p.y-58-(reduced?0:(time/500)%9));
         }
       }
-      paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt));
+      if(layout.mode==='original')paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt));
       if(!paused&&!document.hidden)request=requestAnimationFrame(draw);
     };request=requestAnimationFrame(draw);return()=>cancelAnimationFrame(request);
-  },[assets,state,paused,reduced,selected,hover,camera,size,animateIdle,entries,confirmed,invitedAt]);
+  },[assets,state,paused,reduced,selected,hover,camera,size,layout,animateIdle,entries,confirmed,invitedAt]);
   const local=(event:React.PointerEvent)=>{const rect=host.current!.getBoundingClientRect();return {x:event.clientX-rect.left,y:event.clientY-rect.top};};
   const labelVisible=(x:number,y:number)=>x>=10&&x<=size.width-10&&y>=5&&y<=size.height-35;
   return <div ref={host} className={`castle-scene ${paused||reduced?'motion-still':'motion-active'} ${camera.scale<.4?'zoom-far':''}`} data-testid="castle-scene">
     <canvas ref={canvas} aria-label="Overhead pixel-art castle. Use the room and agent buttons to explore." role="img"
       onPointerDown={event=>{if(event.button!==0)return;const p=local(event);drag.current={...p,camera,moved:false};event.currentTarget.setPointerCapture(event.pointerId);}}
       onPointerMove={event=>{const p=local(event);if(drag.current){const d=drag.current,dx=p.x-d.x,dy=p.y-d.y;if(Math.hypot(dx,dy)>5)d.moved=true;if(d.moved){cameraMode.current='manual';setCamera({...d.camera,x:d.camera.x+dx,y:d.camera.y+dy});}}else setHover(hitAgent(toWorld(p,camera),positions.current)||null);}}
-      onPointerUp={event=>{const d=drag.current;drag.current=null;if(!d||d.moved)return;const point=toWorld(local(event),camera);const hit=hitAgent(point,positions.current);if(hit){onSelect(hit);return;}const room=rooms.find(r=>point.x>=r.bounds[0]&&point.x<=r.bounds[0]+r.bounds[2]&&point.y>=r.bounds[1]&&point.y<=r.bounds[1]+r.bounds[3]);if(room){focusRoom(room.id);onRoom(room.id);}}}
+      onPointerUp={event=>{const d=drag.current;drag.current=null;if(!d||d.moved)return;const point=toWorld(local(event),camera);const hit=hitAgent(point,positions.current);if(hit){onSelect(hit);return;}const room=roomAt(layout,point);if(room){focusRoom(room);onRoom(room);}}}
       onPointerCancel={()=>{drag.current=null;}} onLostPointerCapture={()=>{drag.current=null;}} style={{cursor:drag.current?'grabbing':hover?'pointer':'grab'}} />
-    <div className="map-labels" aria-label="Castle rooms">{rooms.map(room=>{const x=camera.x+room.label.x*camera.scale,y=camera.y+room.label.y*camera.scale,visible=labelVisible(x,y);return <button key={room.id} className="room-label" tabIndex={visible?0:-1} aria-hidden={!visible} style={{left:x,top:y,visibility:visible?'visible':'hidden'}} onClick={()=>{focusRoom(room.id);onRoom(room.id);}}>{room.name}</button>;})}</div>
+    <div className="map-labels" aria-label="Castle rooms">{rooms.map(room=>{const point=roomLabelPoint(layout,room.id);const x=camera.x+point.x*camera.scale,y=camera.y+point.y*camera.scale,visible=labelVisible(x,y);return <button key={room.id} className="room-label" tabIndex={visible?0:-1} aria-hidden={!visible} style={{left:x,top:y,visibility:visible?'visible':'hidden'}} onClick={()=>{focusRoom(room.id);onRoom(room.id);}}>{room.name}</button>;})}</div>
     <div className="map-agent-labels" aria-label="Characters on the map">{visibleAgents.map(agent=>{
-      const travel=!reduced&&state.travel.find(t=>t.agent===agent.id), p=travel?positionOnPath(travel.path,travel.elapsed/travel.duration):agent.position;
+      const travel=layout.mode==='original'&&!reduced&&state.travel.find(t=>t.agent===agent.id), p=placePoint(layout,agent.room,travel?positionOnPath(travel.path,travel.elapsed/travel.duration):agent.position);
       const signal=agentSignal(entries,agent.id), status=confirmed?signal.status:'unconfirmed';
       const x=camera.x+p.x*camera.scale,y=camera.y+(p.y+14)*camera.scale,visible=labelVisible(x,y);
       const label=!confirmed?'Activity unconfirmed':status?`${signal.count} ${signalLabels[status]}`:animateIdle?`Idle · ${idleActivities[agent.id]}`:'Ready';
@@ -101,7 +113,7 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
         <button tabIndex={visible?0:-1} aria-hidden={!visible} aria-label={`Select ${agent.name}, ${agent.title}, ${label}`} title={label} className={`agent-pin ${selected===agent.id?'selected':''} ${status||'ready'}`} style={{left:x,top:y,visibility:visible?'visible':'hidden','--agent-color':agent.color} as React.CSSProperties} onClick={()=>onSelect(agent.id)}><span className="pin-name">{agent.name}</span><span className="pin-signal" aria-hidden="true">{status?signalIcons[status]:'☾'}{status&&signal.count>0&&<b>{signal.count}</b>}</span></button>
       </span>;
     })}</div>
-    {assets.loki&&<button ref={lokiButton} className="loki-pin" aria-label="LOKI, Amron’s companion" aria-expanded={lokiOpen} tabIndex={labelVisible(camera.x+LOKI.x*camera.scale,camera.y+(LOKI.y+12)*camera.scale)?0:-1} style={{left:camera.x+LOKI.x*camera.scale,top:camera.y+(LOKI.y+12)*camera.scale,visibility:labelVisible(camera.x+LOKI.x*camera.scale,camera.y+(LOKI.y+12)*camera.scale)?'visible':'hidden'}} onClick={()=>setLokiOpen(value=>!value)}>LOKI</button>}
+    {assets.loki&&<button ref={lokiButton} className="loki-pin" aria-label="LOKI, Amron’s companion" aria-expanded={lokiOpen} tabIndex={labelVisible(camera.x+placePoint(layout,'war',LOKI).x*camera.scale,camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale)?0:-1} style={{left:camera.x+placePoint(layout,'war',LOKI).x*camera.scale,top:camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale,visibility:labelVisible(camera.x+placePoint(layout,'war',LOKI).x*camera.scale,camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale)?'visible':'hidden'}} onClick={()=>setLokiOpen(value=>!value)}>LOKI</button>}
     {lokiOpen&&<aside className="companion-card" aria-label="LOKI companion" onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();setLokiOpen(false);lokiButton.current?.focus();}}}>
       <button className="companion-close" aria-label="Close LOKI details" onClick={()=>{setLokiOpen(false);lokiButton.current?.focus();}}><X size={16}/></button>
       <strong>LOKI</strong><p>Amron’s little companion. Lounging, watching, and occasionally catching a fairy snack.</p>
