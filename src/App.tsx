@@ -7,6 +7,8 @@ import { UsersThree } from '@phosphor-icons/react/dist/csr/UsersThree';
 import { ArrowRight } from '@phosphor-icons/react/dist/csr/ArrowRight';
 import { ArrowCounterClockwise } from '@phosphor-icons/react/dist/csr/ArrowCounterClockwise';
 import { ArrowsOut } from '@phosphor-icons/react/dist/csr/ArrowsOut';
+import { CornersOut } from '@phosphor-icons/react/dist/csr/CornersOut';
+import { CornersIn } from '@phosphor-icons/react/dist/csr/CornersIn';
 import { Plus } from '@phosphor-icons/react/dist/csr/Plus';
 import { Minus } from '@phosphor-icons/react/dist/csr/Minus';
 import { Pause } from '@phosphor-icons/react/dist/csr/Pause';
@@ -28,6 +30,7 @@ import { agents, rooms, agentTask, createDemo, demoReducer, stages, statusLabels
 import { QueueBadges, SignalInbox, useSignals } from './KingdomSignals';
 import { agentSignal, demoSignals, type SignalEntry } from './signals';
 import { Telemetry } from './UsageReadout';
+import { useCastleFullscreen } from './useCastleFullscreen';
 
 const roomIcons={war:Crown,wizard:BookOpen,elf:PaintBrush,forge:Hammer,hall:CastleTurret,grounds:Tree};
 export function Portrait({agent,assets,large=false}:{agent:Agent;assets:Assets|null;large?:boolean}){
@@ -39,6 +42,7 @@ function StatusBadge({status}:{status:Status|'ready'}){return <span className={`
 
 export function App(){
   const hidden=usePageHidden();
+  const fullscreen=useCastleFullscreen();
   const [state,dispatch]=useReducer(demoReducer,undefined,createDemo);
   const entries=useMemo(()=>demoSignals(state),[state.tasks]);
   const signals=useSignals(entries);
@@ -79,8 +83,8 @@ export function App(){
     </header>
     <main>
       <div className="realm-layout"><aside className="command-sidebar" aria-label="Castle commands"><section className="page-heading"><div><p className="eyebrow">YOUR AGENTS, IN THEIR ELEMENT</p><h1>{view==='castle'?'The realm is at work.':'Good work begins with a quest.'}</h1><p>Seven minds. Four crafts. One shared adventure.</p></div><button className="quiet-button reset" onClick={reset}><ArrowCounterClockwise size={16}/>Reset demo</button></section><nav className="command-nav" aria-label="Main navigation"><button className={view==='castle'?'active':''} aria-current={view==='castle'?'page':undefined} onClick={()=>setView('castle')}><CastleTurret size={18}/>The castle</button><button className={view==='quests'?'active':''} aria-current={view==='quests'?'page':undefined} onClick={()=>setView('quests')}><Scroll size={18}/>Quest board<span className="nav-count">{state.tasks.length}</span></button></nav><section className="kingdom-readout" aria-label="Kingdom at a glance"><div className="signal-toolbar"><QueueBadges entries={entries} controls={signals} onNavigate={navigateSignal}/><SignalInbox entries={entries} controls={signals} onNavigate={navigateSignal} demo/></div><Telemetry/></section></aside>
-        <section className="realm-main" aria-label={view==='castle'?'Castle overview':'Quest board'}>
-          <div className="realm-toolbar"><div className="realm-title"><span className="realm-sigil"><Compass size={18}/></span><strong>{view==='castle'?'Castle of Amron':'The quest ledger'}</strong><span className="toolbar-divider"/><span className="quiet-text">{view==='castle'?'Enchanted woodland':'Sample tasks'}</span></div><span className="realm-weather">{view==='castle'?'A quiet autumn afternoon':`${state.tasks.length} quests in the realm`}</span></div>
+        <section ref={fullscreen.containerRef} className={`realm-main ${fullscreen.expanded?'castle-fullscreen':''}`} aria-label={view==='castle'?'Castle overview':'Quest board'}>
+          <div className="realm-toolbar"><div className="realm-title"><span className="realm-sigil"><Compass size={18}/></span><strong>{view==='castle'?'Castle of Amron':'The quest ledger'}</strong><span className="toolbar-divider"/><span className="quiet-text">{view==='castle'?'Enchanted woodland':'Sample tasks'}</span></div><span className="realm-weather">{view==='castle'?'A quiet autumn afternoon':`${state.tasks.length} quests in the realm`}</span>{view==='castle'&&<button className="fullscreen-toggle" aria-label={fullscreen.expanded?'Exit full screen':'Full screen castle'} aria-pressed={fullscreen.expanded} onClick={fullscreen.toggle}>{fullscreen.expanded?<CornersIn size={16}/>:<CornersOut size={16}/>}<span>{fullscreen.expanded?'Exit full screen':'Full screen'}</span></button>}</div>
           {view==='castle'?<div className="map-wrap">
             {assets?<Scene ref={scene} assets={assets} state={state} paused={paused||reduced||hidden} reduced={reduced} selected={selected||task?.owner||null} entries={entries} onSelect={selectAgent} onRoom={selectRoom} onScale={setScale}/>:<div className="asset-loading"><CastleTurret size={38}/><strong>{error||'Opening the castle gates…'}</strong>{error&&<button onClick={()=>window.location.reload()}>Try again</button>}</div>}
             <div className="map-controls"><button aria-label="Zoom out" title="Zoom out" onClick={()=>scene.current?.zoom(.8)}><Minus size={16}/></button><span>{Math.round(scale*100)}%</span><button aria-label="Zoom in" title="Zoom in" onClick={()=>scene.current?.zoom(1.25)}><Plus size={16}/></button><i/><button className="fit-button" onClick={()=>scene.current?.fit()}><ArrowsOut size={16}/><span>Fit castle</span></button></div>

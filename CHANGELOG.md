@@ -8,6 +8,7 @@ Read [the backlog](BACKLOG.md) for proposed work and [the enhancement ledger](do
 
 - AC-110: a viewport-filling castle command view with persistent navigation, queue signals, notifications and usage in a compact sidebar. Recorded work and quest views use the same layout.
 - The command view adapts to narrow screens, keeping the castle, controls and detail panel accessible in one vertical flow.
+- A Full screen toggle expands the castle scene; Exit full screen restores the command view and its navigation.
 
 ### Verified
 

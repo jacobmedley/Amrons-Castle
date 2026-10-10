@@ -90,3 +90,10 @@
   .app-shell .realm-main{height:410px}
 }
 @media(prefers-reduced-motion:reduce){.command-nav button{transition:none}}
+.realm-toolbar .fullscreen-toggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;margin-left:auto;min-height:32px;padding:5px 9px;border:1px solid #67745a;border-radius:4px;background:#2a3829;color:#e8e5ce;font-size:10px;white-space:nowrap}
+.realm-toolbar .fullscreen-toggle:hover{background:#405038}
+.realm-toolbar .fullscreen-toggle:focus-visible{outline:2px solid #dfc997;outline-offset:2px}
+.app-shell .realm-main.castle-fullscreen,.app-shell .realm-main:fullscreen{position:fixed;inset:0;z-index:50;width:100vw;height:100dvh;max-height:none;min-height:0;border-radius:0;background:#182119}
+.app-shell .realm-main.castle-fullscreen .map-wrap,.app-shell .realm-main:fullscreen .map-wrap{flex:1;height:auto;min-height:0}
+.app-shell .realm-main:fullscreen::backdrop{background:#0c1713}
+@media(max-width:720px){.realm-toolbar .fullscreen-toggle{padding:6px;min-width:33px}.realm-toolbar .fullscreen-toggle span{display:none}.realm-toolbar .realm-weather{display:none}}

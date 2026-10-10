@@ -33,6 +33,7 @@ The static build is in `dist/client`. Relative asset URLs support hosting under 
 ## Explore
 
 - Select a room or agent; drag to pan and scroll or use buttons to zoom.
+- Select **Full screen** in the castle toolbar to fill the display with the scene. Use **Exit full screen** to return to the command view, then switch to the quest or work board.
 - Inspect Orin’s Moonwell brief. Approve to hand work to the next specialist, or request changes to keep the current owner and feedback.
 - Every stage waits for approval, through Amron’s final review.
 - Inspect sample model/effort assignments without confusing them with runtime telemetry.
