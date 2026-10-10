@@ -5,7 +5,13 @@ The environment and sprites were created for this project on October 7, 2026, us
 | Asset | Dimensions | Creation and use |
 |---|---|---|
 | `public/assets/castle.png` | 1536 × 1024 | One environment generation: a roofless stone castle, six areas, warm torches, emerald forest and turquoise pool. A decorative suit of armor in the Great Hall belongs to the background, not the agent roster. |
-| `public/assets/enchanted-forest.png` | 1254 × 1254 | Generated October 10, 2026 with the castle as a style reference. The canvas mirrors a central crop to fill exposed space around the castle and rearranged room tiles. The source PNG is preserved. [Full prompt](public/assets/enchanted-forest.prompt.txt). |
+| `public/assets/castle-21x9.png` | 1916 × 821 | Complete panoramic castle generated October 10, 2026 using the original castle as the art and architecture reference. |
+| `public/assets/castle-16x9.png` | 1672 × 941 | Complete wide castle generated with the same reference and six connected areas. |
+| `public/assets/castle-4x3.png` | 1448 × 1086 | Complete landscape castle generated with the same reference and six connected areas. |
+| `public/assets/castle-1x1.png` | 1254 × 1254 | Complete square castle generated with the same reference and six connected areas. |
+| `public/assets/castle-3x4.png` | 1086 × 1448 | Complete portrait castle generated with the same reference and six connected areas. |
+| `public/assets/castle-9x16.png` | 941 × 1672 | Complete tall castle generated with the same reference and six connected areas. |
+| `public/assets/enchanted-forest.png` | 1254 × 1254 | Generated October 10, 2026 with the castle as a style reference. The canvas mirrors a central crop to fill space outside a castle composition. The source PNG is preserved. [Full prompt](public/assets/enchanted-forest.prompt.txt). |
 | `public/assets/amron.png` | 1498 × 1050, transparent | One character generation: eight poses for Amron, with four command/idle frames and four walking frames. |
 | `public/assets/specialists.png` | 1024 × 1536, transparent | One character generation: six specialists with four action poses each. |
 | `public/assets/specialists-frames.json` | Structured metadata | Measured source rectangles and foot anchors for the specialist sprites. Generated sheet spacing is not assumed to be uniform. |
@@ -13,7 +19,7 @@ The environment and sprites were created for this project on October 7, 2026, us
 | `public/assets/borin-attention.png` | 1207 × 1303, transparent | Four original raised-arm attention poses made with the built-in image-generation tool, using Borin's existing sheet as an identity reference. Original generated pixels preserved; measured floor anchors are in `src/assets.ts`. [Full prompt](public/assets/borin-attention.prompt.txt). |
 | `public/assets/loki.png` | 1536 × 2288, transparent | The owner's existing custom companion artwork, reused unchanged at his request for LOKI beside Amron. Its original 192 × 208 cells provide idle, jump and snack gestures. Unused cells are excluded. No pet account setting or original asset was changed. |
 
-The application preserves the original raster files. It selects measured frames and renders them at a consistent display scale with image smoothing disabled. World coordinates and walkable routes follow the resulting environment rather than the coordinates initially requested in the art prompt.
+The application preserves the original raster files. Each new composition paints a whole roofless stone castle with connected War Room, Wizard Workshop, Elven Atelier, Great Hall, Moonwell Gardens and Dwarven Forge, surrounded by woodland. The image-generation edits used `castle.png` as the visual reference, kept the original overhead pixel-art style and requested no people or labels. The application adds the character sprites, room labels and interactive controls. It selects measured sprite frames and renders them with image smoothing disabled. World coordinates and walkable routes follow the resulting environment rather than the coordinates initially requested in the art prompt.
 
 The full idle-generation prompt is saved in [public/assets/idle.prompt.txt](public/assets/idle.prompt.txt). The generated PNG is used unchanged with its alpha channel. The [frame check](docs/changes/kingdom-signals/screenshots/idle-frame-check.png) renders both poses at their measured ground anchors. Attention hops, exclamation signals and halos are runtime Canvas/HTML effects. Idle vignettes are decorative and do not establish model activity.
 

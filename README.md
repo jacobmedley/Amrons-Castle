@@ -34,7 +34,7 @@ The static build is in `dist/client`. Relative asset URLs support hosting under 
 
 - Select a room or agent; drag to pan and scroll or use buttons to zoom.
 - Select **Full screen** in the castle toolbar to fill the display with the scene. Use **Exit full screen** to return to the command view, then switch to the quest or work board.
-- Rotate or resize the screen to see the rooms rearrange into portrait or panoramic compositions. **Fit castle** restores the whole arrangement; choose a room or agent to focus it.
+- Rotate or resize the screen to see the whole castle rebuild for six common screen shapes, from 21:9 to 9:16. The original 3:2 castle remains available between those shapes. **Fit castle** restores the whole scene; choose a room or agent to focus it.
 - Inspect Orin’s Moonwell brief. Approve to hand work to the next specialist, or request changes to keep the current owner and feedback.
 - Every stage waits for approval, through Amron’s final review.
 - Inspect sample model/effort assignments without confusing them with runtime telemetry.

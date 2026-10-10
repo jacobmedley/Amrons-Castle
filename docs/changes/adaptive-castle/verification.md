@@ -1,22 +1,22 @@
 # Adaptive castle layout verification
 
-October 10, 2026 · local feature branch `feat/adaptive-castle-layout` · AC-117 · unreleased.
+October 10, 2026 · AC-117 · unreleased. The first implementation used isolated room crops. It was replaced on `feat/six-complete-castles` after review.
 
 ## Change
 
-The six rooms use their original painted arrangement when the scene has a suitable aspect ratio. A narrow or tall scene places the rooms in two columns and three rows. A short, wide scene places them in three columns and two rows. The renderer crops each room from the existing castle painting, then moves its character sprites, companion, decorative effects, room labels and hit area with the tile. Focus and Fit castle use the active arrangement. Changing layout mode returns the camera to its overview, avoiding a stale camera position after rotation.
+The scene selects the closest complete castle composition for its available width and height: 21:9, 16:9, 4:3, 1:1, 3:4 or 9:16. The original 3:2 scene remains a seventh option. Each generated composition is one continuous painting with connected architecture, all six areas and surrounding woodland. Rotation or resizing switches the whole scene and fits the camera to it. The normal and full-screen views use the same selection logic.
 
-A generated woodland texture fills space outside the original painting and between tiles. Its centered crop is mirrored to form a repeatable pattern. On smaller screens, the zoom and motion controls occupy a strip below the scene so they do not cover the lower rooms. The command sidebar remains scrollable in short landscape view.
+Room labels, selection areas, character sprites, LOKI and decorative effects map to areas in each composition. Character identity, room membership and task signals stay unchanged. The woodland texture covers space outside the selected painting. On smaller screens, the zoom and motion controls occupy a strip below the scene so they do not cover the lower rooms. The command sidebar remains scrollable in short landscape view.
 
-The portrait and panoramic arrangements are composed from rectangular painted crops, so architecture at the crop boundaries does not connect as it does in the original castle. Walk travel is shown in the original arrangement; in a rearranged view, characters remain at their room stations while the task state and signals continue normally. Reconnecting room corridors and animating travel between moved rooms would require modular room art and a new path model.
+Walk travel is shown in the original composition; in generated views, characters remain at their room stations while the task state and signals continue normally. Ambient motion still obeys Pause motion and reduced motion.
 
 ## Checks
 
 - `npm.cmd run typecheck` passed.
-- `npm.cmd test` passed: 37/37 tests, including arrangement selection and room geometry.
+- `npm.cmd test` passed: 37/37 tests, including composition selection and point mapping.
 - `npm.cmd run build` passed.
-- In-app browser inspection covered 1920 × 1080 desktop, 390 × 844 portrait and 844 × 390 short landscape viewport overrides. The room tiles and woodland filled each scene shape. Portrait controls did not cover the lower room tiles. No horizontal document overflow was observed in the narrow view.
-- Selecting Elven Atelier in the panoramic arrangement opened its details and focused its tile. Fit castle restored the overview. Full screen could be exited, and Quest board navigation remained available.
-- The optional live view loaded without a compatible host, retained explicit unconfirmed activity and unavailable usage, and made no model calls from the page.
+- In-app browser inspection covered all six generated compositions in the expanded castle view. War Room, Wizard Workshop, Elven Atelier, Great Hall, Moonwell Gardens and Dwarven Forge appeared within connected castle walls in each image. Character badges and labels remained in their intended areas. The original 3:2 composition was also inspected.
+- Selecting Dwarven Forge in the 4:3 composition opened its details and focused the room. Fit castle restored the overview. The full-screen toggle returned to the command view.
+- The earlier command-view and unavailable-live checks remain recorded in their own verification files; this change does not alter task data or adapter behavior.
 
 Browser checks do not establish full accessibility conformance or physical-device coverage. This branch has not been released, deployed or installed into the Genesis static host.

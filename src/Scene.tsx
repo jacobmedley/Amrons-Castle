@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useMemo, forwardRef, useImperativeHandle } from 'react';
-import { agents, rooms, WORLD, positionOnPath, toWorld, hitAgent, type Camera, type DemoState, type Point, type RoomId } from './model';
+import { agents, rooms, positionOnPath, toWorld, hitAgent, type Camera, type DemoState, type Point, type RoomId } from './model';
 import { idleActivities, paintIdle, paintSprite, paintAttention, type Assets } from './assets';
 import { WarningCircle } from '@phosphor-icons/react/dist/csr/WarningCircle';
 import { X } from '@phosphor-icons/react/dist/csr/X';
@@ -28,12 +28,12 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
   const focusRoom=useCallback((id:RoomId)=>{cameraMode.current='manual';const room=rooms.find(r=>r.id===id)!;const point=placePoint(layout,id,room.center);const scale=Math.min(1.35,size.width/560,size.height/440);setCamera({scale,x:size.width/2-point.x*scale,y:size.height/2-point.y*scale});},[size,layout]);
   const focusAgent=useCallback((id:string)=>{const agent=agents.find(item=>item.id===id);const point=positions.current.find(item=>item.id===id)?.point||(agent&&placePoint(layout,agent.room,agent.position));if(!point)return;cameraMode.current='manual';const scale=Math.min(1.5,size.width/480,size.height/340);setCamera({scale,x:size.width/2-point.x*scale,y:size.height/2-(point.y-20)*scale});},[size,layout]);
   useImperativeHandle(ref,()=>({fit,zoom,focusRoom,focusAgent}),[fit,zoom,focusRoom,focusAgent]);
-  useEffect(()=>{const h=host.current!;let previous={width:h.clientWidth,height:h.clientHeight};let previousMode=createSceneLayout(previous.width,previous.height).mode;
+  useEffect(()=>{const h=host.current!;let previous={width:h.clientWidth,height:h.clientHeight};let previousMode=createSceneLayout(previous.width,previous.height).id;
     const ro=new ResizeObserver(()=>{const next={width:h.clientWidth,height:h.clientHeight};setSize(current=>current.width===next.width&&current.height===next.height?current:next);
       const nextLayout=createSceneLayout(next.width,next.height);
-      if(cameraMode.current==='fit'||nextLayout.mode!==previousMode){cameraMode.current='fit';const scale=Math.min(next.width/nextLayout.width,next.height/nextLayout.height);setCamera({x:(next.width-nextLayout.width*scale)/2,y:(next.height-nextLayout.height*scale)/2,scale});}
+      if(cameraMode.current==='fit'||nextLayout.id!==previousMode){cameraMode.current='fit';const scale=Math.min(next.width/nextLayout.width,next.height/nextLayout.height);setCamera({x:(next.width-nextLayout.width*scale)/2,y:(next.height-nextLayout.height*scale)/2,scale});}
       else if(next.width!==previous.width||next.height!==previous.height){const dx=(next.width-previous.width)/2,dy=(next.height-previous.height)/2;setCamera(c=>({...c,x:c.x+dx,y:c.y+dy}));}
-      previous=next;previousMode=nextLayout.mode;
+      previous=next;previousMode=nextLayout.id;
     });ro.observe(h);return()=>ro.disconnect();},[]);
   useEffect(()=>{onScale(camera.scale);},[camera.scale,onScale]);
   useEffect(()=>{const h=host.current!;const wheel=(event:WheelEvent)=>{event.preventDefault();const b=h.getBoundingClientRect();zoom(Math.exp(-event.deltaY*.0015),{x:event.clientX-b.left,y:event.clientY-b.top});};h.addEventListener('wheel',wheel,{passive:false});return()=>h.removeEventListener('wheel',wheel);},[zoom]);
@@ -46,21 +46,23 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
       ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,size.width,size.height);ctx.fillStyle='#0c1713';ctx.fillRect(0,0,size.width,size.height);
       ctx.translate(camera.x,camera.y);ctx.scale(camera.scale,camera.scale);ctx.imageSmoothingEnabled=false;
       paintForest(ctx,assets.forest,camera,size.width,size.height);
-      if(layout.mode==='original')ctx.drawImage(assets.castle,0,0,WORLD.width,WORLD.height);
-      else for(const tile of layout.tiles){
-        ctx.save();ctx.shadowColor='#020b09';ctx.shadowBlur=25;ctx.fillStyle='#10201b';ctx.fillRect(tile.x-7,tile.y-7,tile.width+14,tile.height+14);ctx.restore();
-        ctx.drawImage(assets.castle,...tile.source,tile.x,tile.y,tile.width,tile.height);
-        ctx.strokeStyle='#c5a96d';ctx.lineWidth=3;ctx.strokeRect(tile.x-4,tile.y-4,tile.width+8,tile.height+8);
-      }
+      ctx.drawImage(assets.castles[layout.id],0,0,layout.width,layout.height);
       const ambientTime=reduced?0:frameTime.current;
-      if(layout.mode==='original')paintEnvironment(ctx,ambientTime);
-      else for(const tile of layout.tiles){ctx.save();ctx.beginPath();ctx.rect(tile.x,tile.y,tile.width,tile.height);ctx.clip();ctx.translate(tile.x-tile.source[0],tile.y-tile.source[1]);paintEnvironment(ctx,ambientTime,tile.source);if(tile.id==='war')paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt));ctx.restore();}
-      positions.current=visibleAgents.map(agent=>{const travel=layout.mode==='original'&&!reduced&&state.travel.find(t=>t.agent===agent.id);const point=travel?positionOnPath(travel.path,travel.elapsed/travel.duration):agent.position;return {id:agent.id,point:placePoint(layout,agent.room,point)};});
+      if(layout.id==='original')paintEnvironment(ctx,ambientTime);
+      else for(const room of rooms){
+        const [sx,sy,sw,sh]=room.bounds,[tx,ty,tw,th]=layout.bounds[room.id];
+        ctx.save();ctx.translate(tx,ty);ctx.scale(tw/sw,th/sh);ctx.translate(-sx,-sy);
+        ctx.beginPath();ctx.rect(sx,sy,sw,sh);ctx.clip();
+        paintEnvironment(ctx,ambientTime,room.bounds);
+        if(room.id==='war')paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt));
+        ctx.restore();
+      }
+      positions.current=visibleAgents.map(agent=>{const travel=layout.id==='original'&&!reduced&&state.travel.find(t=>t.agent===agent.id);const point=travel?positionOnPath(travel.path,travel.elapsed/travel.duration):agent.position;return {id:agent.id,point:placePoint(layout,agent.room,point)};});
       const sorted=[...positions.current].sort((a,b)=>a.point.y-b.point.y);
       for(const {id,point:p} of sorted){
         const agent=agents.find(a=>a.id===id)!;
         const signal=agentSignal(entries,id);
-        const walking=layout.mode==='original'&&!reduced&&state.travel.some(t=>t.agent===id);
+        const walking=layout.id==='original'&&!reduced&&state.travel.some(t=>t.agent===id);
         const working=confirmed&&signal.assigned.some(entry=>entry.status==='working');
         const attention=confirmed&&(signal.status==='review'||signal.status==='blocked');
         const time=reduced?0:frameTime.current;
@@ -90,7 +92,7 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
           ctx.fillStyle='#d0cee9';ctx.font='bold 14px monospace';ctx.fillText('z',p.x+18,p.y-58-(reduced?0:(time/500)%9));
         }
       }
-      if(layout.mode==='original')paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt));
+      if(layout.id==='original')paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt));
       if(!paused&&!document.hidden)request=requestAnimationFrame(draw);
     };request=requestAnimationFrame(draw);return()=>cancelAnimationFrame(request);
   },[assets,state,paused,reduced,selected,hover,camera,size,layout,animateIdle,entries,confirmed,invitedAt]);
@@ -104,7 +106,7 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
       onPointerCancel={()=>{drag.current=null;}} onLostPointerCapture={()=>{drag.current=null;}} style={{cursor:drag.current?'grabbing':hover?'pointer':'grab'}} />
     <div className="map-labels" aria-label="Castle rooms">{rooms.map(room=>{const point=roomLabelPoint(layout,room.id);const x=camera.x+point.x*camera.scale,y=camera.y+point.y*camera.scale,visible=labelVisible(x,y);return <button key={room.id} className="room-label" tabIndex={visible?0:-1} aria-hidden={!visible} style={{left:x,top:y,visibility:visible?'visible':'hidden'}} onClick={()=>{focusRoom(room.id);onRoom(room.id);}}>{room.name}</button>;})}</div>
     <div className="map-agent-labels" aria-label="Characters on the map">{visibleAgents.map(agent=>{
-      const travel=layout.mode==='original'&&!reduced&&state.travel.find(t=>t.agent===agent.id), p=placePoint(layout,agent.room,travel?positionOnPath(travel.path,travel.elapsed/travel.duration):agent.position);
+      const travel=layout.id==='original'&&!reduced&&state.travel.find(t=>t.agent===agent.id), p=placePoint(layout,agent.room,travel?positionOnPath(travel.path,travel.elapsed/travel.duration):agent.position);
       const signal=agentSignal(entries,agent.id), status=confirmed?signal.status:'unconfirmed';
       const x=camera.x+p.x*camera.scale,y=camera.y+(p.y+14)*camera.scale,visible=labelVisible(x,y);
       const label=!confirmed?'Activity unconfirmed':status?`${signal.count} ${signalLabels[status]}`:animateIdle?`Idle · ${idleActivities[agent.id]}`:'Ready';
