@@ -14,6 +14,7 @@ This ledger records implemented behavior. Read [the backlog](../BACKLOG.md) for 
 | AC-008 | 0.1.0 | Versioned release, backlog, issue forms, contributor/release guidance and CI configuration | [Contributing](../CONTRIBUTING.md), [release procedure](RELEASING.md), [workflow](../.github/workflows/ci.yml) |
 | AC-110 | Unreleased | Viewport-filling castle with persistent command sidebar, compact queues, usage, navigation and responsive detail layout | [Command view verification](changes/command-view/verification.md) |
 | AC-117 | Unreleased | Six complete connected castles adapt from 21:9 through 9:16, preserving labels, characters and room selection; the original 3:2 scene remains available | [Adaptive layout verification](changes/adaptive-castle/verification.md) |
+| AC-101 | Unreleased | Local display-name editor for the seven agents and LOKI, including a Dot shortcut for the coordinator; versioned preferences preserve immutable identities and task ownership | [Name settings verification](changes/character-names/verification.md) |
 
 ## Record the next change
 

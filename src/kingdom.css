@@ -18,6 +18,8 @@ main{max-width:none;padding:18px clamp(14px,2vw,36px) 0}
 .observation-footnote{margin:15px 0 0;font-size:10px;line-height:1.5;color:#99a68f}.observation-footnote button{font-size:inherit;padding:2px 0;color:#c7b585;text-decoration:underline;text-underline-offset:3px}
 .page-footer{margin-top:14px}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 summary:focus-visible,select:focus-visible{outline:2px solid #dfc997;outline-offset:4px}
+.name-settings-trigger{white-space:nowrap}.name-settings{width:min(640px,calc(100vw - 28px));max-height:min(88svh,780px);overflow:auto}.name-settings h2{margin:3px 0 8px}.name-settings>p,.name-settings-note{line-height:1.5}.name-settings-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.name-settings-fields label{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:12px}.name-settings-fields label span{display:flex;justify-content:space-between;gap:5px}.name-settings-fields label small{color:#b7bda9;font-size:10px}.name-settings-fields input{width:100%;min-width:0;border:1px solid #697659;border-radius:5px;background:#14221c;color:#f6ead0;padding:9px 10px;font:inherit}.name-settings-fields input:focus-visible{outline:2px solid #dfc997;outline-offset:2px}.name-settings-note{font-size:11px;color:#c8cfbd}.name-settings-error{color:#ffbcaa;font-size:12px}.name-settings-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px}
+@media(max-width:600px){.name-settings-fields{grid-template-columns:1fr}.name-settings-fields label span{align-items:center}}
 
 /* Status sigils are real buttons, with text and counts independent of color. */
 .kingdom-readout{position:relative;margin-bottom:12px;border:1px solid #536044;border-radius:7px;background:linear-gradient(105deg,#273125,#1b2822);box-shadow:inset 0 1px #bcb27b12}
@@ -55,7 +57,7 @@ summary:focus-visible,select:focus-visible{outline:2px solid #dfc997;outline-off
 
 /* Agent sigils stay separate from raster art and remain keyboard selectable. */
 .agent-pin{min-height:23px;gap:5px;padding:3px 6px;border-radius:5px;font-size:10px;width:auto;height:auto;max-width:100px;line-height:1.2}
-.pin-name{display:block}.pin-signal{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding-left:5px;border-left:1px solid #b6c59055}.pin-signal b{font-size:9px;font-weight:600}
+.pin-name{display:block;max-width:78px;overflow:hidden;text-overflow:ellipsis}.pin-signal{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding-left:5px;border-left:1px solid #b6c59055}.pin-signal b{font-size:9px;font-weight:600}
 .agent-pin.review{border-color:#b29452;background:#332e1cef}.agent-pin.working{border-color:#618c73}.agent-pin.complete{border-color:#6b9a8a}
 .attention-beacon{position:absolute;transform:translate(-50%,-100%);display:grid;place-content:center;width:21px;height:25px;border:1px solid #e2c27a;border-radius:9px 9px 9px 1px;color:#ffe0a2;background:#493a1fea;font:bold 17px 'DM Sans',sans-serif;box-shadow:0 0 12px #e5c06a44}
 .motion-active .attention-beacon{animation:beacon-bob 2.2s ease-in-out infinite}@keyframes beacon-bob{0%,100%{transform:translate(-50%,-100%)}50%{transform:translate(-50%,calc(-100% - 5px))}}

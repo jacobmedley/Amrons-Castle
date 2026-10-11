@@ -35,6 +35,7 @@ The static build is in `dist/client`. Relative asset URLs support hosting under 
 - Select a room or agent; drag to pan and scroll or use buttons to zoom.
 - Select **Full screen** in the castle toolbar to fill the display with the scene. Use **Exit full screen** to return to the command view, then switch to the quest or work board.
 - Rotate or resize the screen to see the whole castle rebuild for six common screen shapes, from 21:9 to 9:16. The original 3:2 castle remains available between those shapes. **Fit castle** restores the whole scene; choose a room or agent to focus it.
+- Use **Edit names** to set local display names for the seven agents and LOKI. **Use Dot for the coordinator** changes only the queen's display name; **Restore defaults** brings back Amron and the original cast. The settings are stored in this browser and shared by Demo and the optional live view on the same origin.
 - Inspect Orin’s Moonwell brief. Approve to hand work to the next specialist, or request changes to keep the current owner and feedback.
 - Every stage waits for approval, through Amron’s final review.
 - Inspect sample model/effort assignments without confusing them with runtime telemetry.
@@ -55,7 +56,7 @@ The live adapter checks recorded work about every 6 seconds and usage about ever
 
 Pause motion stops visual effects; live observations continue. In the Demo, pausing also stops simulated progression. Operating-system reduced motion provides a static scene and disables fairy invitations.
 
-Character-name editing, selectable color themes and saved preferences are **planned**, not available in this release. The [backlog](BACKLOG.md) defines their acceptance criteria. Bug and enhancement reports use GitHub forms; the application does not upload diagnostics automatically.
+Character-name editing is implemented on the unreleased feature branch. Selectable color themes and broader saved preferences remain [planned](BACKLOG.md). Mirroring the selected ChatGPT pet's name and appearance requires an authenticated host integration; the standalone page keeps the local LOKI artwork and an editable companion name. Bug and enhancement reports use GitHub forms; the application does not upload diagnostics automatically.
 
 ## Independent core, optional integrations
 
@@ -77,7 +78,7 @@ The default demo makes no API requests. No credentials, private records, machine
 
 [Case study](case-study.md) · [Artwork provenance](ASSET_PROVENANCE.md) · [Dependency notices](THIRD_PARTY_NOTICES.md) · [Contributing](CONTRIBUTING.md) · [Release procedure](docs/RELEASING.md)
 
-The [adaptive layout verification](docs/changes/adaptive-castle/verification.md), [command view verification](docs/changes/command-view/verification.md), [kingdom signals verification](docs/changes/kingdom-signals/verification.md) and [living castle verification](docs/changes/living-castle/verification.md) record interaction, layout, animation and telemetry evidence. The current suite has 37 tests. Browser checks do not establish full accessibility conformance or physical-device coverage.
+The [name settings verification](docs/changes/character-names/verification.md), [adaptive layout verification](docs/changes/adaptive-castle/verification.md), [command view verification](docs/changes/command-view/verification.md), [kingdom signals verification](docs/changes/kingdom-signals/verification.md) and [living castle verification](docs/changes/living-castle/verification.md) record interaction, layout, animation and telemetry evidence. The current suite has 39 tests. Browser checks do not establish full accessibility conformance or physical-device coverage.
 
 ## Troubleshoot the prototype
 

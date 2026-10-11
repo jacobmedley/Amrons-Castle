@@ -4,13 +4,14 @@ import { idleActivities, paintIdle, paintSprite, paintAttention, type Assets } f
 import { WarningCircle } from '@phosphor-icons/react/dist/csr/WarningCircle';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import { LOKI, fairyPhase, paintEnvironment, paintCompanion } from './ambience';
+import type { CharacterNames } from './characterNames';
 import { agentSignal, signalIcons, signalLabels, type SignalEntry } from './signals';
 import { paintForest } from './forest';
 import { createSceneLayout, placePoint, roomAt, roomLabelPoint } from './sceneLayout';
 export type SceneHandle = { fit: () => void; zoom: (factor:number) => void; focusRoom: (id:RoomId) => void; focusAgent: (id:string) => void };
-type Props={assets:Assets;state:DemoState;paused:boolean;reduced:boolean;selected:string|null;onSelect:(id:string)=>void;onRoom:(id:RoomId)=>void;onScale:(scale:number)=>void;animateIdle?:boolean; entries?:SignalEntry[]; confirmed?:boolean};
+type Props={assets:Assets;state:DemoState;paused:boolean;reduced:boolean;selected:string|null;onSelect:(id:string)=>void;onRoom:(id:RoomId)=>void;onScale:(scale:number)=>void;animateIdle?:boolean; entries?:SignalEntry[]; confirmed?:boolean; names?:CharacterNames};
 const visibleAgents=agents;
-export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,paused,reduced,selected,onSelect,onRoom,onScale,animateIdle=true,entries=[],confirmed=true},ref){
+export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,paused,reduced,selected,onSelect,onRoom,onScale,animateIdle=true,entries=[],confirmed=true,names={}},ref){
   const host=useRef<HTMLDivElement>(null),canvas=useRef<HTMLCanvasElement>(null);
   const [size,setSize]=useState({width:900,height:600});
   const layout=useMemo(()=>createSceneLayout(size.width,size.height),[size.width,size.height]);
@@ -112,13 +113,13 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
       const label=!confirmed?'Activity unconfirmed':status?`${signal.count} ${signalLabels[status]}`:animateIdle?`Idle · ${idleActivities[agent.id]}`:'Ready';
       return <span key={agent.id}>
         {confirmed&&(status==='review'||status==='blocked')&&<span className={`attention-beacon ${status}`} aria-hidden="true" style={{left:x,top:camera.y+(p.y-(status==='blocked'?70:88))*camera.scale}}><WarningCircle size={status==='blocked'?28:19} weight="fill"/></span>}
-        <button tabIndex={visible?0:-1} aria-hidden={!visible} aria-label={`Select ${agent.name}, ${agent.title}, ${label}`} title={label} className={`agent-pin ${selected===agent.id?'selected':''} ${status||'ready'}`} style={{left:x,top:y,visibility:visible?'visible':'hidden','--agent-color':agent.color} as React.CSSProperties} onClick={()=>onSelect(agent.id)}><span className="pin-name">{agent.name}</span><span className="pin-signal" aria-hidden="true">{status?signalIcons[status]:'☾'}{status&&signal.count>0&&<b>{signal.count}</b>}</span></button>
+        <button tabIndex={visible?0:-1} aria-hidden={!visible} aria-label={`Select ${names[agent.id] || agent.name}, ${agent.title}, ${label}`} title={label} className={`agent-pin ${selected===agent.id?'selected':''} ${status||'ready'}`} style={{left:x,top:y,visibility:visible?'visible':'hidden','--agent-color':agent.color} as React.CSSProperties} onClick={()=>onSelect(agent.id)}><span className="pin-name">{names[agent.id] || agent.name}</span><span className="pin-signal" aria-hidden="true">{status?signalIcons[status]:'☾'}{status&&signal.count>0&&<b>{signal.count}</b>}</span></button>
       </span>;
     })}</div>
-    {assets.loki&&<button ref={lokiButton} className="loki-pin" aria-label="LOKI, Amron’s companion" aria-expanded={lokiOpen} tabIndex={labelVisible(camera.x+placePoint(layout,'war',LOKI).x*camera.scale,camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale)?0:-1} style={{left:camera.x+placePoint(layout,'war',LOKI).x*camera.scale,top:camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale,visibility:labelVisible(camera.x+placePoint(layout,'war',LOKI).x*camera.scale,camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale)?'visible':'hidden'}} onClick={()=>setLokiOpen(value=>!value)}>LOKI</button>}
-    {lokiOpen&&<aside className="companion-card" aria-label="LOKI companion" onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();setLokiOpen(false);lokiButton.current?.focus();}}}>
-      <button className="companion-close" aria-label="Close LOKI details" onClick={()=>{setLokiOpen(false);lokiButton.current?.focus();}}><X size={16}/></button>
-      <strong>LOKI</strong><p>Amron’s little companion. Lounging, watching, and occasionally catching a fairy snack.</p>
+    {assets.loki&&<button ref={lokiButton} className="loki-pin" aria-label={`${names.loki || 'LOKI'}, ${names.amron || 'Amron'}’s companion`} aria-expanded={lokiOpen} tabIndex={labelVisible(camera.x+placePoint(layout,'war',LOKI).x*camera.scale,camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale)?0:-1} style={{left:camera.x+placePoint(layout,'war',LOKI).x*camera.scale,top:camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale,visibility:labelVisible(camera.x+placePoint(layout,'war',LOKI).x*camera.scale,camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale)?'visible':'hidden'}} onClick={()=>setLokiOpen(value=>!value)}>{names.loki || 'LOKI'}</button>}
+    {lokiOpen&&<aside className="companion-card" aria-label={`${names.loki || 'LOKI'} companion`} onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();setLokiOpen(false);lokiButton.current?.focus();}}}>
+      <button className="companion-close" aria-label={`Close ${names.loki || 'LOKI'} details`} onClick={()=>{setLokiOpen(false);lokiButton.current?.focus();}}><X size={16}/></button>
+      <strong>{names.loki || 'LOKI'}</strong><p>{names.amron || 'Amron'}’s little companion. Lounging, watching, and occasionally catching a fairy snack.</p>
       <button className="fairy-invite" disabled={paused||reduced} onClick={()=>setInvitedAt(frameTime.current)}>Invite a fairy</button><small>{reduced?'Reduced motion is enabled.':paused?'Resume motion to invite a fairy.':'Ambient story · no tasks or model calls'}</small>
     </aside>}
   </div>;
