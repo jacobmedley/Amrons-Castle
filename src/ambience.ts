@@ -51,13 +51,15 @@ export function paintEnvironment(ctx:CanvasRenderingContext2D,time:number,bounds
   }
   ctx.restore();
 }
-export function paintCompanion(ctx:CanvasRenderingContext2D,assets:Assets,time:number,event:number) {
-  if(!assets.loki)return;
+export function paintCompanion(ctx:CanvasRenderingContext2D,assets:Assets,time:number,event:number,petArtwork?:ImageBitmap|null) {
+  if(!assets.loki&&!petArtwork)return;
   const jump=event>=4600&&event<5900?Math.sin((event-4600)/1300*Math.PI)*30:0;
   const row=jump>0?4:event>=5900&&event<7300?7:0;
   const frame=row===4?Math.min(4,Math.floor((event-4600)/260)):row===7?Math.min(5,Math.floor((event-5900)/230)):Math.floor(time/340)%7;
   ctx.save();ctx.fillStyle='#07161199';ctx.beginPath();ctx.ellipse(LOKI.x,LOKI.y+1,18,5,0,0,TAU);ctx.fill();ctx.shadowColor='#fff0c799';ctx.shadowBlur=5;
-  ctx.drawImage(assets.loki,frame*192,row*208,192,208,LOKI.x-29,LOKI.y-62-jump,58,63);ctx.restore();
+  if(petArtwork)ctx.drawImage(petArtwork,LOKI.x-29,LOKI.y-62-jump,58,63);
+  else if(assets.loki)ctx.drawImage(assets.loki,frame*192,row*208,192,208,LOKI.x-29,LOKI.y-62-jump,58,63);
+  ctx.restore();
   if(event<0)return;
   if(event<5650){
     const t=Math.min(1,event/5650),x=822+(LOKI.x-822)*t+Math.sin(t*TAU*2)*22*(1-t),y=128+(LOKI.y-54-128)*t+Math.sin(t*TAU*3)*12;

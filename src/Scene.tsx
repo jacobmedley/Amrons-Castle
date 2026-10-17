@@ -9,9 +9,9 @@ import { agentSignal, signalIcons, signalLabels, type SignalEntry } from './sign
 import { paintForest } from './forest';
 import { createSceneLayout, placePoint, roomAt, roomLabelPoint } from './sceneLayout';
 export type SceneHandle = { fit: () => void; zoom: (factor:number) => void; focusRoom: (id:RoomId) => void; focusAgent: (id:string) => void };
-type Props={assets:Assets;state:DemoState;paused:boolean;reduced:boolean;selected:string|null;onSelect:(id:string)=>void;onRoom:(id:RoomId)=>void;onScale:(scale:number)=>void;animateIdle?:boolean; entries?:SignalEntry[]; confirmed?:boolean; names?:CharacterNames};
+type Props={assets:Assets;state:DemoState;paused:boolean;reduced:boolean;selected:string|null;onSelect:(id:string)=>void;onRoom:(id:RoomId)=>void;onScale:(scale:number)=>void;animateIdle?:boolean; entries?:SignalEntry[]; confirmed?:boolean; names?:CharacterNames;pet?:{name:string;artwork:ImageBitmap}|null};
 const visibleAgents=agents;
-export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,paused,reduced,selected,onSelect,onRoom,onScale,animateIdle=true,entries=[],confirmed=true,names={}},ref){
+export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,paused,reduced,selected,onSelect,onRoom,onScale,animateIdle=true,entries=[],confirmed=true,names={},pet=null},ref){
   const host=useRef<HTMLDivElement>(null),canvas=useRef<HTMLCanvasElement>(null);
   const [size,setSize]=useState({width:900,height:600});
   const layout=useMemo(()=>createSceneLayout(size.width,size.height),[size.width,size.height]);
@@ -55,7 +55,7 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
         ctx.save();ctx.translate(tx,ty);ctx.scale(tw/sw,th/sh);ctx.translate(-sx,-sy);
         ctx.beginPath();ctx.rect(sx,sy,sw,sh);ctx.clip();
         paintEnvironment(ctx,ambientTime,room.bounds);
-        if(room.id==='war')paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt));
+        if(room.id==='war')paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt),pet?.artwork);
         ctx.restore();
       }
       positions.current=visibleAgents.map(agent=>{const travel=layout.id==='original'&&!reduced&&state.travel.find(t=>t.agent===agent.id);const point=travel?positionOnPath(travel.path,travel.elapsed/travel.duration):agent.position;return {id:agent.id,point:placePoint(layout,agent.room,point)};});
@@ -93,10 +93,10 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
           ctx.fillStyle='#d0cee9';ctx.font='bold 14px monospace';ctx.fillText('z',p.x+18,p.y-58-(reduced?0:(time/500)%9));
         }
       }
-      if(layout.id==='original')paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt));
+      if(layout.id==='original')paintCompanion(ctx,assets,ambientTime,reduced?-1:fairyPhase(ambientTime,eventSeed.current,invitedAt),pet?.artwork);
       if(!paused&&!document.hidden)request=requestAnimationFrame(draw);
     };request=requestAnimationFrame(draw);return()=>cancelAnimationFrame(request);
-  },[assets,state,paused,reduced,selected,hover,camera,size,layout,animateIdle,entries,confirmed,invitedAt]);
+  },[assets,state,paused,reduced,selected,hover,camera,size,layout,animateIdle,entries,confirmed,invitedAt,pet]);
   const local=(event:React.PointerEvent)=>{const rect=host.current!.getBoundingClientRect();return {x:event.clientX-rect.left,y:event.clientY-rect.top};};
   const labelVisible=(x:number,y:number)=>x>=10&&x<=size.width-10&&y>=5&&y<=size.height-35;
   return <div ref={host} className={`castle-scene ${paused||reduced?'motion-still':'motion-active'} ${camera.scale<.4?'zoom-far':''}`} data-testid="castle-scene">
@@ -116,10 +116,10 @@ export const Scene=forwardRef<SceneHandle,Props>(function Scene({assets,state,pa
         <button tabIndex={visible?0:-1} aria-hidden={!visible} aria-label={`Select ${names[agent.id] || agent.name}, ${agent.title}, ${label}`} title={label} className={`agent-pin ${selected===agent.id?'selected':''} ${status||'ready'}`} style={{left:x,top:y,visibility:visible?'visible':'hidden','--agent-color':agent.color} as React.CSSProperties} onClick={()=>onSelect(agent.id)}><span className="pin-name">{names[agent.id] || agent.name}</span><span className="pin-signal" aria-hidden="true">{status?signalIcons[status]:'☾'}{status&&signal.count>0&&<b>{signal.count}</b>}</span></button>
       </span>;
     })}</div>
-    {assets.loki&&<button ref={lokiButton} className="loki-pin" aria-label={`${names.loki || 'LOKI'}, ${names.amron || 'Amron'}’s companion`} aria-expanded={lokiOpen} tabIndex={labelVisible(camera.x+placePoint(layout,'war',LOKI).x*camera.scale,camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale)?0:-1} style={{left:camera.x+placePoint(layout,'war',LOKI).x*camera.scale,top:camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale,visibility:labelVisible(camera.x+placePoint(layout,'war',LOKI).x*camera.scale,camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale)?'visible':'hidden'}} onClick={()=>setLokiOpen(value=>!value)}>{names.loki || 'LOKI'}</button>}
-    {lokiOpen&&<aside className="companion-card" aria-label={`${names.loki || 'LOKI'} companion`} onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();setLokiOpen(false);lokiButton.current?.focus();}}}>
-      <button className="companion-close" aria-label={`Close ${names.loki || 'LOKI'} details`} onClick={()=>{setLokiOpen(false);lokiButton.current?.focus();}}><X size={16}/></button>
-      <strong>{names.loki || 'LOKI'}</strong><p>{names.amron || 'Amron'}’s little companion. Lounging, watching, and occasionally catching a fairy snack.</p>
+    {(assets.loki||pet)&&<button ref={lokiButton} className="loki-pin" aria-label={`${pet?.name || names.loki || 'LOKI'}, ${names.amron || 'Amron'}’s companion`} aria-expanded={lokiOpen} tabIndex={labelVisible(camera.x+placePoint(layout,'war',LOKI).x*camera.scale,camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale)?0:-1} style={{left:camera.x+placePoint(layout,'war',LOKI).x*camera.scale,top:camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale,visibility:labelVisible(camera.x+placePoint(layout,'war',LOKI).x*camera.scale,camera.y+(placePoint(layout,'war',LOKI).y+12)*camera.scale)?'visible':'hidden'}} onClick={()=>setLokiOpen(value=>!value)}>{pet?.name || names.loki || 'LOKI'}</button>}
+    {lokiOpen&&<aside className="companion-card" aria-label={`${pet?.name || names.loki || 'LOKI'} companion`} onKeyDown={event=>{if(event.key==='Escape'){event.stopPropagation();setLokiOpen(false);lokiButton.current?.focus();}}}>
+      <button className="companion-close" aria-label={`Close ${pet?.name || names.loki || 'LOKI'} details`} onClick={()=>{setLokiOpen(false);lokiButton.current?.focus();}}><X size={16}/></button>
+      <strong>{pet?.name || names.loki || 'LOKI'}</strong><p>{pet ? 'Selected pet reported by the connected host. Its visit is decorative and does not represent agent activity.' : `${names.amron || 'Amron'}’s little companion. Lounging, watching, and occasionally catching a fairy snack.`}</p>
       <button className="fairy-invite" disabled={paused||reduced} onClick={()=>setInvitedAt(frameTime.current)}>Invite a fairy</button><small>{reduced?'Reduced motion is enabled.':paused?'Resume motion to invite a fairy.':'Ambient story · no tasks or model calls'}</small>
     </aside>}
   </div>;

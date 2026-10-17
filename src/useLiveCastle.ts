@@ -23,7 +23,9 @@ export function useLiveCastle() {
         const response = await fetch('/api/castle', { signal: controller.signal, cache: 'no-store', credentials: 'same-origin' });
         if (response.status === 401 || response.status === 403) throw new Error('Sign-in required. Open the dashboard to reconnect.');
         if (!response.ok) throw new Error('Dashboard updates are unavailable. Retrying automatically.');
-        const data = parseLiveSnapshot(await response.json());
+        if (!response.headers.get('content-type')?.toLowerCase().includes('application/json')) throw new Error('Dashboard updates are unavailable. Retrying automatically.');
+        const payload: unknown = await response.json().catch(() => { throw new Error('Dashboard observation is unreadable.'); });
+        const data = parseLiveSnapshot(payload);
         if (!cancelled) {
           const fingerprint = JSON.stringify(data.runs);
           setChanged(!!previous.current && previous.current !== fingerprint); previous.current = fingerprint;

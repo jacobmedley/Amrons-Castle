@@ -56,7 +56,7 @@ The live adapter checks recorded work about every 6 seconds and usage about ever
 
 Pause motion stops visual effects; live observations continue. In the Demo, pausing also stops simulated progression. Operating-system reduced motion provides a static scene and disables fairy invitations.
 
-Character-name editing is implemented on the unreleased feature branch. Selectable color themes and broader saved preferences remain [planned](BACKLOG.md). Mirroring the selected ChatGPT pet's name and appearance requires an authenticated host integration; the standalone page keeps the local LOKI artwork and an editable companion name. Bug and enhancement reports use GitHub forms; the application does not upload diagnostics automatically.
+Character-name editing is implemented on the unreleased feature branch. Selectable color themes and broader saved preferences remain [planned](BACKLOG.md). The optional live view now accepts a [host identity observation](adapters/genesis/IDENTITY.md) for a selected pet's name and appearance and a dot's delegated tasks. No current host supplies that observation. The standalone Demo keeps LOKI and cannot read ChatGPT selections. Bug and enhancement reports use GitHub forms; the application does not upload diagnostics automatically.
 
 ## Independent core, optional integrations
 
@@ -78,7 +78,7 @@ The default demo makes no API requests. No credentials, private records, machine
 
 [Case study](case-study.md) · [Artwork provenance](ASSET_PROVENANCE.md) · [Dependency notices](THIRD_PARTY_NOTICES.md) · [Contributing](CONTRIBUTING.md) · [Release procedure](docs/RELEASING.md)
 
-The [name settings verification](docs/changes/character-names/verification.md), [adaptive layout verification](docs/changes/adaptive-castle/verification.md), [command view verification](docs/changes/command-view/verification.md), [kingdom signals verification](docs/changes/kingdom-signals/verification.md) and [living castle verification](docs/changes/living-castle/verification.md) record interaction, layout, animation and telemetry evidence. The current suite has 39 tests. Browser checks do not establish full accessibility conformance or physical-device coverage.
+The [name settings verification](docs/changes/character-names/verification.md), [adaptive layout verification](docs/changes/adaptive-castle/verification.md), [command view verification](docs/changes/command-view/verification.md), [kingdom signals verification](docs/changes/kingdom-signals/verification.md) and [living castle verification](docs/changes/living-castle/verification.md) record interaction, layout, animation and telemetry evidence. The current suite has 42 tests. Browser checks do not establish full accessibility conformance or physical-device coverage.
 
 ## Troubleshoot the prototype
 

@@ -36,4 +36,6 @@ The compact ledger reads the host's existing authenticated `/api/observe?days=7`
 
 The installed host integration does not expose provider account allowance/reset time. Those fields say **Not connected**; no development snapshot is embedded as live quota. **Tokens saved** is **Not measured** because there is no supported counterfactual baseline. The compact band shows measured **Cache reused** instead. Reported Token Use output retains the host's accounting caveat rather than inferring a correction or a bill.
 
+The optional [ChatGPT identity observation contract](IDENTITY.md) describes selected pet artwork and read-only dot task display. The current Genesis host does not provide these endpoints; the Castle shows LOKI and an explicit unavailable state until a compatible authenticated host is connected.
+
 Badges follow stable recorded-update order. Repeated clicks advance individual tasks, even when several belong to the same agent. Completed runs open the Great Hall archive because the contract has no current owner for completed work. Notifications observe meaningful status/owner/stage transitions after the initial baseline, stay in browser memory, and never approve work.

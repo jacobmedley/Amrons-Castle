@@ -26,7 +26,7 @@ export function NameSettings({ names, onSave, onRestore }: Props) {
           <label htmlFor="name-loki"><span>Castle companion<small>Default: LOKI</small></span><input id="name-loki" value={draft[companionId] ?? ''} maxLength={56} autoComplete="off" onChange={event => setDraft(current => ({ ...current, [companionId]: event.target.value }))}/></label>
         </div>
         <button type="button" className="text-button" onClick={() => setDraft(current => ({ ...current, amron: 'Dot' }))}>Use Dot for the coordinator</button>
-        <p className="name-settings-note">Dot here is a display name. The castle does not connect to a ChatGPT dot or change agent permissions. Your ChatGPT pet selection is not available to this standalone page; the companion art remains LOKI for now.</p>
+        <p className="name-settings-note">Dot here is a display name; it does not change your ChatGPT dot or agent permissions. The standalone Demo cannot read your pet selection. A compatible authenticated host may show a selected pet and dot in the live view.</p>
         {error && <p className="name-settings-error" role="alert">{error}</p>}
         <div className="name-settings-actions"><button type="button" className="secondary-button" onClick={() => { onRestore(); setDraft({ ...characterDefaults }); setError(''); }}>Restore defaults</button><button type="submit" className="primary-button">Save names</button></div>
       </form>

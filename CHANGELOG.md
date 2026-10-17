@@ -11,10 +11,11 @@ Read [the backlog](BACKLOG.md) for proposed work and [the enhancement ledger](do
 - A Full screen toggle expands the castle scene; Exit full screen restores the command view and its navigation.
 - AC-117: six complete, connected castle illustrations adapt to 21:9, 16:9, 4:3, 1:1, 3:4 and 9:16 scene shapes. The original 3:2 castle remains available. Character pins, room labels, effects and selection areas follow each arrangement; woodland fills any exposed canvas.
 - AC-101: edit local character and companion display names. The coordinator can appear as Dot while keeping Amron as the default identity. Names persist locally and do not change roles, ownership, model settings or approval behavior.
+- AC-118/AC-119 foundation: an optional read-only host identity contract can supply a selected pet's name and artwork and a dot's delegated tasks. Missing or stale observations keep LOKI and show identity as unavailable. A real authenticated host source is still required.
 
 ### Verified
 
-- TypeScript checking, all 39 tests and the production build pass. Desktop, portrait-phone, short-landscape, Demo and unavailable-live layouts were inspected in the browser. The six complete compositions were also inspected in full-screen view. The name editor and a long coordinator name were inspected on a phone-sized screen.
+- TypeScript checking, all 42 tests and the production build pass. Desktop, portrait-phone, short-landscape, Demo and unavailable-live layouts were inspected in the browser. The six complete compositions were also inspected in full-screen view. The name editor and a long coordinator name were inspected on a phone-sized screen. The identity connection fallback was inspected at desktop and phone widths; no real pet or dot source was available for an end-to-end account check.
 
 ## 0.1.0 - 2026-10-07
 
