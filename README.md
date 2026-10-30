@@ -4,6 +4,8 @@ An independent, interactive fantasy RPG interface for agent work. Explore a cast
 
 **v0.1.0 · Public prototype · MIT**
 
+[Play the demo](https://jacobmedley.github.io/Amrons-Castle/) in your browser. All tasks are fictional; no account, backend or model calls are needed.
+
 [Release notes](CHANGELOG.md) · [Enhancement ledger](docs/ENHANCEMENTS.md) · [Backlog and ideas](BACKLOG.md) · [Report a bug](https://github.com/jacobmedley/Amrons-Castle/issues/new?template=bug_report.yml)
 
 Queen **Amron** is inspired by the creator’s wife. “Amron” is her name spelled backwards. Her identity belongs to the character, not to a model or model release. She remains a Black warrior queen with dark braids, a crown, gold-trimmed armor and a violet cloak.
@@ -28,7 +30,7 @@ npm run build
 npm run preview
 ```
 
-The static build is in `dist/client`. Relative asset URLs support hosting under a repository subpath. Keep dependency notices with redistributed builds.
+The static build is in `dist/client`. Relative asset URLs support hosting under a repository subpath. Keep dependency notices with redistributed builds. The `Publish the demo` GitHub Actions workflow checks and publishes `main` to GitHub Pages, including the project license and dependency notices. It can also be run manually from Actions.
 
 ## Explore
 
