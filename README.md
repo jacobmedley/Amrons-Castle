@@ -4,7 +4,9 @@ An independent, interactive fantasy RPG interface for agent work. Explore a cast
 
 **v0.1.0 · Public prototype · MIT**
 
-[Download the ready-built demo](https://github.com/jacobmedley/Amrons-Castle/releases/download/v0.1.0/amrons-castle-v0.1.0-demo.zip), extract it and follow `START-HERE.txt` to play through a local web server. All tasks are fictional; no account, backend or model calls are needed.
+[Play the demo in your browser](https://jacobmedley.github.io/Amrons-Castle/). All tasks are fictional; no account, backend or model calls are needed.
+
+You can also [download the ready-built demo](https://github.com/jacobmedley/Amrons-Castle/releases/download/v0.1.0/amrons-castle-v0.1.0-demo.zip), extract it and follow `START-HERE.txt` to play through a local web server.
 
 [Release notes](CHANGELOG.md) · [Enhancement ledger](docs/ENHANCEMENTS.md) · [Backlog and ideas](BACKLOG.md) · [Report a bug](https://github.com/jacobmedley/Amrons-Castle/issues/new?template=bug_report.yml)
 
@@ -30,7 +32,7 @@ npm run build
 npm run preview
 ```
 
-The static build is in `dist/client`. Relative asset URLs support hosting under a repository subpath. Keep dependency notices with redistributed builds. The `Publish the demo` GitHub Actions workflow checks and publishes `main` to GitHub Pages, including the project license and dependency notices. It can also be run manually from Actions. Hosted playback awaits the repository's first Pages activation: in [Settings → Pages](https://github.com/jacobmedley/Amrons-Castle/settings/pages), select **GitHub Actions** as the source, then rerun **Publish the demo**.
+The static build is in `dist/client`. Relative asset URLs support hosting under a repository subpath. Keep dependency notices with redistributed builds. The `Publish the demo` GitHub Actions workflow checks and publishes `main` to GitHub Pages, including the project license and dependency notices. It can also be run manually from Actions.
 
 ## Explore
 
